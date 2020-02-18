@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <!-- <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    /> -->
+  </head>
+  <div id='graph-container'> </div>
+    <script>
+        function plot(input) {
+          const Plotly = require("plotly.js-dist");
+
+          Plotly.setPlotConfig({
+            mapboxAccessToken:
+              "pk.eyJ1Ijoicm9uemltIiwiYSI6ImNqdDdtOWIzZDBmODA0OWp6bThxbGZhYXgifQ.t4KKKWA-zOe6OLzFhuT0bw",
+              responsive:true
+          });
+          Plotly.newPlot("graph-container", input.data, input.layout, input.config);
+        }
+
+      var ipcRenderer = require("electron").ipcRenderer;
+      ipcRenderer.on("ping", function(event, store) {
+        console.log(event, store);
+        plot(store);
+      });
+    </script>
+  </body>
+</html>
