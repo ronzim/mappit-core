@@ -13,7 +13,7 @@
     "electron": "^9.4.0",
     "plotly.js-dist": "^1.52.2",
     "simple-statistics": "^7.0.8",
-    "underscore": "^1.9.2",
+    "underscore": "^1.12.1",
     "yargs": "^15.1.0"
   }
 }
