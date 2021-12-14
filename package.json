@@ -1,9 +1,11 @@
 {
-  "name": "tryElectron",
-  "version": "1.0.0",
+  "name": "MappIt",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
+  "dev": true,
   "scripts": {
+    "start": "electron main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

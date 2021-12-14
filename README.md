@@ -8,7 +8,7 @@ google locations plot tool with command line interface
 
 ## example usage
 
-$ electron main.js --loadfile ./Takeout/location_history/location_history.json --filterdate '09-01-2019' '09-09-2019' --plot heatmap --render
+$ npm start -- --loadfile ./Takeout/location_history/location_history.json --filterdate '09-01-2019' '09-09-2019' --plot heatmap --render
 
 ## Google's description of location_history.json
 
@@ -50,3 +50,11 @@ Cronologia delle posizioni semantica composta da segmenti relativi ad attività 
 ### JSON
 
 I file JSON della cronologia delle posizioni semantica descrivono gli oggetti della cronologia di Google, come segmenti relativi ad attività e visite a luoghi dedotte tra le visite ai luoghi.
+
+## Roadmap
+
+The idea could be to have a node-friendly library to reduce data amount (eg simply filtering on date), and then a webapp / electron app to render the data.
+
+- Manage big json data (bigger than 500 MB)
+- Replace plotly with deck.gl
+- Download canvas and result data

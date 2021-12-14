@@ -2,9 +2,7 @@ const { app, BrowserWindow, screen } = require("electron");
 const { prepareData, applyFilters } = require("./deps/geo_plot.js");
 const loader = require("./deps/loader.js");
 
-const argv = require("yargs")
-  .array("filterdate")
-  .array("filterspace").argv;
+const argv = require("yargs").array("filterdate").array("filterspace").argv;
 
 // IMPLEMENTED CLI COMMANDS:
 // --loadfile : load positions from file
