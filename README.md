@@ -58,3 +58,8 @@ The idea could be to have a node-friendly library to reduce data amount (eg simp
 - Manage big json data (bigger than 500 MB)
 - Replace plotly with deck.gl
 - Download canvas and result data
+
+## Hints
+
+- Mapbox styles
+- Plotly or deckgl?

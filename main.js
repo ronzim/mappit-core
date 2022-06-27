@@ -48,9 +48,11 @@ function prepare() {
 
   let data = loader.load(argv.loadfile); // "./Takeout/location_history/location_history.json";
 
+  console.log(data);
+
   let filterData = argv.filterdate
     ? applyFilters(data, "date", argv.filterdate)
-    : data;
+    : data.locations;
 
   let plotData = prepareData(filterData, argv.plot);
 

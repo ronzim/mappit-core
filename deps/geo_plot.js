@@ -24,7 +24,7 @@ var core = require("./core.js");
 // }
 // console.log(new Date(parseInt(data.locations[1].timestampMs)))
 
-let applyFilters = function(data, filterType, filtersOpts) {
+let applyFilters = function (data, filterType, filtersOpts) {
   console.log("applying filters...");
   console.time("applying filters");
   let filtered;
@@ -43,7 +43,7 @@ let applyFilters = function(data, filterType, filtersOpts) {
   return filtered;
 };
 
-let prepareData = function(timeSpanData, type) {
+let prepareData = function (timeSpanData, type) {
   console.log("preparing plot... size: ", timeSpanData.length);
   console.time("preparing plot");
   let plot;
