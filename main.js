@@ -1,4 +1,5 @@
 const { app, BrowserWindow, screen } = require("electron");
+const fs = require("fs-extra");
 const { prepareData, applyFilters } = require("./deps/geo_plot.js");
 const loader = require("./deps/loader.js");
 
@@ -10,7 +11,7 @@ const argv = require("yargs").array("filterdate").array("filterspace").argv;
 // --TODO filterspace [lat_max, lat_min, lng_max, lng_min] : filter by position
 // --plot byActivityType/byVelocity/heatmap : prepare data to be rendered in each format
 // --render : render plot using electron
-// --TODO outfile : write filtered data to file
+// -- writeOutput : write filtered data to file
 
 // ACTUAL LIMITS:
 // - heatmaps over 10k pts has performance issues (implement clustering)
@@ -46,21 +47,26 @@ function prepare() {
   console.log("preparing...");
   console.log(argv);
 
-  let data = loader.load(argv.loadfile); // "./Takeout/location_history/location_history.json";
+  loader.load(argv.loadfile).then(data => {
+    // console.log(data);
 
-  console.log(data);
+    let filterData = argv.filterdate
+      ? applyFilters(data, "date", argv.filterdate)
+      : data.locations;
 
-  let filterData = argv.filterdate
-    ? applyFilters(data, "date", argv.filterdate)
-    : data.locations;
+    if (argv.writeOutput) {
+      const reducedData = { locations: filterData };
+      fs.writeJsonSync(argv.writeOutput, reducedData);
+    }
 
-  let plotData = prepareData(filterData, argv.plot);
+    let plotData = prepareData(filterData, argv.plot);
 
-  if (argv.render) {
-    createWindow(plotData);
-  } else {
-    app.quit();
-  }
+    if (argv.render) {
+      createWindow(plotData);
+    } else {
+      app.quit();
+    }
+  });
 }
 
 // function plot(input) {

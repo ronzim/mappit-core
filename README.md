@@ -21,7 +21,7 @@ Dati sulla posizione raccolti durante l'adesione alla Cronologia delle posizioni
 Il file Cronologia delle posizioni JSON descrive i segnali relativi alla posizione del dispositivo e i metadati associati raccolti mentre la Cronologia delle posizioni era attiva e che non hai successivamente eliminato.
 
 -locations: tutti i record di posizione.  
--timestampMs(int64): timestamp (UTC) in millisecondi per la posizione registrata.  
+-timestampMs(int64): timestamp (UTC) in millisecondi per la posizione registrata. -> è diventato `timestamp` espresso in stringa ISO
 -latitudeE7(int32): il valore di latitudine della posizione in formato E7 (gradi moltiplicati per 10^7 e arrotondati al numero intero più vicino).  
 -longitudeE7(int32): il valore di longitudine della posizione in formato E7 (gradi moltiplicati per 10^7 e arrotondati al numero intero più vicino).  
 -accuracy(int32): raggio approssimativo di precisione della posizione in metri.  

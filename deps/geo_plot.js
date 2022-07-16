@@ -17,12 +17,12 @@ var filters = require("./filters.js");
 var core = require("./core.js");
 
 // {
-//   timestampMs: '23456789',
+//   timestamp: '23456789',
 //   latitudeE7: 3456789,
 //   longitudeE7: 3456789,
 //   accuracy: 12
 // }
-// console.log(new Date(parseInt(data.locations[1].timestampMs)))
+// console.log(new Date(parseInt(data.locations[1].timestamp)))
 
 let applyFilters = function (data, filterType, filtersOpts) {
   console.log("applying filters...");
@@ -74,7 +74,7 @@ exports.prepareData = prepareData;
 // Il file Cronologia delle posizioni JSON descrive i segnali relativi alla posizione del dispositivo e i metadati associati raccolti mentre Cronologia delle posizioni era attiva e che non hai successivamente eliminato.
 
 // posizioni: tutti i record di posizione.
-// timestampMs(int64): timestamp (UTC) in millisecondi per la posizione registrata.
+// timestamp(int64): timestamp (UTC) in millisecondi per la posizione registrata.
 // latitudeE7(int32): il valore di latitudine della posizione in formato E7 (gradi moltiplicati per 10**7 e arrotondati al numero intero più vicino).
 // longitudeE7(int32): il valore di longitudine della posizione in formato E7 (gradi moltiplicati per 10**7 e arrotondati al numero intero più vicino).
 // accuracy(int32): raggio approssimativo di precisione della posizione in metri.
@@ -83,7 +83,7 @@ exports.prepareData = prepareData;
 // altitude(int32): metri sopra l'ellissoide di riferimento WGS84.
 // verticalAccuracy(int32): precisione verticale calcolata in metri.
 // activity: informazioni sull'attività svolta nella posizione.
-// timestampMs(int64): timestamp (UTC) in millisecondi per l'attività registrata.
+// timestamp(int64): timestamp (UTC) in millisecondi per l'attività registrata.
 // type: descrizione del tipo di attività.
 // confidence(int32): affidabilità associata al tipo di attività specificato.
 // KML

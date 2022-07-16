@@ -2,7 +2,14 @@ var utils = require("./utils.js");
 var filters = require("./filters.js");
 var _ = require("underscore");
 
-const { scl, viridis_mod, map, defaultsMargin } = require("./defaults.js");
+const { scl, viridis_mod, map, margin } = require("./defaults.js");
+
+// STYLES
+// carto-darkmatter, carto-positron, open-street-map, stamen-terrain,
+// stamen-toner, stamen-watercolor, white-bg
+// The built-in Mapbox styles are: basic, streets, outdoors,
+// light, dark, satellite, satellite-streets
+// style: "mapbox://styles/ronzim/cl26kqq3l000315pj3jsra2o7",
 
 // HIGH LEVEL FUNCTIONS
 
@@ -11,8 +18,8 @@ function plotByActivityType(sourceData) {
   sourceData = filters.sanityCheck(sourceData, "activity");
 
   // parse int
-  sourceData.forEach(function(d) {
-    d.timestampMs = parseInt(d.timestampMs);
+  sourceData.forEach(function (d) {
+    d.timestamp = parseInt(d.timestamp);
   });
 
   function getBestConfidence(act) {
@@ -45,7 +52,7 @@ function plotByActivityType(sourceData) {
     lon: _.pluck(sourceData, "longitudeE7").map(a => a / 1e7),
     mode: "markers",
     marker: {
-      size: 2,
+      size: 4,
       color: colors,
       colorscale: scl
     },
@@ -70,12 +77,13 @@ function plotByActivityType(sourceData) {
       //   y: [0, 1]
       // },
       pitch: 0,
-      zoom: 9,
-      style: "dark",
+      zoom: 6,
+      // style: "dark",
+      style: "mapbox://styles/ronzim/cl26kqq3l000315pj3jsra2o7",
       heigth: 1000,
       width: 1000
     },
-    margin: defaultsMargin
+    margin
   };
 
   return { data: data, layout: layout };
@@ -88,11 +96,11 @@ function plotByVelocity(sourceData) {
 
   // select only data with velocity
   console.log(sourceData[0]);
-  console.log(new Date(sourceData[0].timestampMs));
+  console.log(new Date(sourceData[0].timestamp));
 
   // parse int
-  sourceData.forEach(function(d) {
-    d.timestampMs = parseInt(d.timestampMs);
+  sourceData.forEach(function (d) {
+    d.timestamp = parseInt(d.timestamp);
   });
 
   let scl = [
