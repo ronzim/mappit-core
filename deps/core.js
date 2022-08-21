@@ -13,95 +13,10 @@ const { scl, viridis_mod, map, margin } = require("./defaults.js");
 
 // HIGH LEVEL FUNCTIONS
 
-function plotByActivityType(sourceData) {
-  // select only data with activities
-  sourceData = filters.sanityCheck(sourceData, "activity");
-
-  // parse int
-  sourceData.forEach(function (d) {
-    d.timestamp = parseInt(d.timestamp);
-  });
-
-  function getBestConfidence(act) {
-    let max;
-    if (act) {
-      max = _.max(act, a => {
-        return a.confidence;
-      });
-    }
-    return max ? max.type : null;
-  }
-
-  function mapToColor(type) {
-    return type ? map[type] : "blue";
-  }
-
-  let activities = _.pluck(sourceData, "activity");
-
-  activities = _.map(activities, a => {
-    return a ? a.pop().activity : null;
-  });
-
-  activities = _.map(activities, getBestConfidence);
-
-  let colors = _.map(activities, mapToColor);
-
-  var trace = {
-    type: "scattermapbox",
-    lat: _.pluck(sourceData, "latitudeE7").map(a => a / 1e7),
-    lon: _.pluck(sourceData, "longitudeE7").map(a => a / 1e7),
-    mode: "markers",
-    marker: {
-      size: 4,
-      color: colors,
-      colorscale: scl
-    },
-    text: []
-  };
-
-  var data = [trace];
-
-  var layout = {
-    autosize: false,
-    heigth: 1000,
-    width: 1000,
-    hovermode: "closest",
-    mapbox: {
-      bearing: 0,
-      center: {
-        lat: utils.mean(_.pluck(sourceData, "latitudeE7").map(a => a / 1e7)),
-        lon: utils.mean(_.pluck(sourceData, "longitudeE7").map(a => a / 1e7))
-      },
-      // domain: {
-      //   x: [0, 1],
-      //   y: [0, 1]
-      // },
-      pitch: 0,
-      zoom: 6,
-      // style: "dark",
-      style: "mapbox://styles/ronzim/cl26kqq3l000315pj3jsra2o7",
-      heigth: 1000,
-      width: 1000
-    },
-    margin
-  };
-
-  return { data: data, layout: layout };
-}
-
 function plotByVelocity(sourceData) {
-  // sourceData = _.filter(sourceData, loc => {
-  //   return loc.velocity;
-  // });
-
   sourceData = sourceData.map(loc => {
     loc.velocity = loc.velocity ? loc.velocity : -1;
     return loc;
-  });
-
-  // parse int
-  sourceData.forEach(function (d) {
-    d.timestamp = parseInt(d.timestamp);
   });
 
   let scl = [
@@ -128,18 +43,10 @@ function plotByVelocity(sourceData) {
 
   let altitudes = _.pluck(sourceData, "altitude");
 
-  // console.log(velocities);
-  // velocities = _.map(velocities, a => {
-  //   return a ? a.pop().activity : null;
-  // });
-  // console.log(velocities);
-  // velocities = _.map(velocities, getBestConfidence);
-  // console.log(velocities);
+  let velocities = _.pluck(sourceData, "velocity");
 
-  let colors = _.map(altitudes, mapToColor);
-  console.log(colors);
-
-  // colors = Object.keys(colors);
+  // let colors = _.map(altitudes, mapToColor);
+  let colors = _.map(velocities, mapToColor);
 
   var trace = {
     type: "scattermapbox",
@@ -147,9 +54,10 @@ function plotByVelocity(sourceData) {
     lon: _.pluck(sourceData, "longitudeE7").map(a => a / 1e7),
     mode: "markers",
     marker: {
-      size: 2,
+      size: 5,
       color: colors,
-      colorscale: scl
+      colorscale: scl,
+      showscale: true
     },
     text: []
   };
@@ -157,9 +65,9 @@ function plotByVelocity(sourceData) {
   var data = [trace];
 
   var layout = {
-    autosize: false,
-    heigth: 1000,
-    width: 1000,
+    autosize: true,
+    heigth: 2000,
+    width: 1200,
     hovermode: "closest",
     mapbox: {
       bearing: 0,
@@ -173,9 +81,54 @@ function plotByVelocity(sourceData) {
       // },
       pitch: 0,
       zoom: 9,
-      style: "dark",
-      heigth: 1000,
-      width: 1000
+      style: "dark"
+    },
+    margin: {
+      r: 0,
+      t: 0,
+      b: 0,
+      l: 0,
+      pad: 0
+    },
+    coloraxis: {
+      showscale: true
+    }
+  };
+
+  return { data: data, layout: layout };
+}
+
+function scatterRaw(sourceData) {
+  var trace = {
+    type: "scattermapbox",
+    lat: _.pluck(sourceData, "latitudeE7").map(a => a / 1e7),
+    lon: _.pluck(sourceData, "longitudeE7").map(a => a / 1e7),
+    mode: "markers",
+    marker: {
+      size: 5
+    }
+  };
+
+  var data = [trace];
+
+  var layout = {
+    autosize: true,
+    heigth: 2000,
+    width: 1200,
+    hovermode: "closest",
+    mapbox: {
+      bearing: 0,
+      center: {
+        lat: utils.mean(_.pluck(sourceData, "latitudeE7").map(a => a / 1e7)),
+        lon: utils.mean(_.pluck(sourceData, "longitudeE7").map(a => a / 1e7))
+      },
+      // domain: {
+      //   x: [0, 1],
+      //   y: [0, 1]
+      // },
+      pitch: 0,
+      zoom: 9,
+      style: "satellite-streets"
     },
     margin: {
       r: 0,
@@ -216,7 +169,13 @@ function plotHeatmap(sourceData) {
     title: { text: "gmaps positions" },
     width: 1200,
     height: 800,
-    margin: defaultsMargin
+    margin: {
+      r: 0,
+      t: 0,
+      b: 0,
+      l: 0,
+      pad: 0
+    }
   };
 
   return {
@@ -226,9 +185,9 @@ function plotHeatmap(sourceData) {
   };
 }
 
-exports.plotByActivityType = plotByActivityType;
 exports.plotByVelocity = plotByVelocity;
 exports.plotHeatmap = plotHeatmap;
+exports.scatterRaw = scatterRaw;
 
 // PLOTLY opts
 // {staticPlot: true} -> remove all uis

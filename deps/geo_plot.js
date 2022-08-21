@@ -48,9 +48,6 @@ let prepareData = function (timeSpanData, type) {
   console.time("preparing plot");
   let plot;
   switch (type) {
-    case "byactivity":
-      plot = core.plotByActivityType(timeSpanData);
-      break;
     case "byvelocity":
       plot = core.plotByVelocity(timeSpanData);
       break;
@@ -58,7 +55,7 @@ let prepareData = function (timeSpanData, type) {
       plot = core.plotHeatmap(timeSpanData);
       break;
     default:
-      console.warn("NO PLOT SELECTED");
+      plot = core.scatterRaw(timeSpanData);
   }
   console.timeEnd("preparing plot");
 
