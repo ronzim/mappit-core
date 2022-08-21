@@ -90,13 +90,14 @@ function plotByActivityType(sourceData) {
 }
 
 function plotByVelocity(sourceData) {
-  sourceData = _.filter(sourceData, loc => {
-    return loc.velocity;
-  });
+  // sourceData = _.filter(sourceData, loc => {
+  //   return loc.velocity;
+  // });
 
-  // select only data with velocity
-  console.log(sourceData[0]);
-  console.log(new Date(sourceData[0].timestamp));
+  sourceData = sourceData.map(loc => {
+    loc.velocity = loc.velocity ? loc.velocity : -1;
+    return loc;
+  });
 
   // parse int
   sourceData.forEach(function (d) {

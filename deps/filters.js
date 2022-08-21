@@ -20,6 +20,7 @@ function byDate(data, start, end) {
       new Date(loc.timestamp) < new Date(end)
     );
   });
+  console.log("...", timeSpanData.length);
   return timeSpanData;
 }
 

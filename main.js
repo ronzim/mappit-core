@@ -11,7 +11,7 @@ const argv = require("yargs").array("filterdate").array("filterspace").argv;
 // --TODO filterspace [lat_max, lat_min, lng_max, lng_min] : filter by position
 // --plot byActivityType/byVelocity/heatmap : prepare data to be rendered in each format
 // --render : render plot using electron
-// -- writeOutput : write filtered data to file
+// --writeOutput : write filtered data to file
 
 // ACTUAL LIMITS:
 // - heatmaps over 10k pts has performance issues (implement clustering)

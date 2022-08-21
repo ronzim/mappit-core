@@ -8,7 +8,7 @@ google locations plot tool with command line interface
 
 ## example usage
 
-$ npm start -- --loadfile ./Takeout/location_history/location_history.json --filterdate '09-01-2019' '09-09-2019' --plot heatmap --render
+$ npm start -- --loadfile ./Takeout/location_history/Records.json --filterdate '2022-08-06' '2022-08-17' --plot heatmap --render
 
 ## Google's description of location_history.json
 
@@ -55,9 +55,12 @@ I file JSON della cronologia delle posizioni semantica descrivono gli oggetti de
 
 The idea could be to have a node-friendly library to reduce data amount (eg simply filtering on date), and then a webapp / electron app to render the data.
 
-- Manage big json data (bigger than 500 MB)
-- Replace plotly with deck.gl
-- Download canvas and result data
+- [x] Manage big json data (bigger than 500 MB)
+- [ ] Replace plotly with deck.gl
+- [ ] Download canvas and result data
+- [ ] Show progress bar https://github.com/npkgz/cli-progress
+- [ ] Reworking plot types
+- [ ] Merge multiple Records.json
 
 ## Hints
 

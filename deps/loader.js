@@ -80,7 +80,7 @@ function printFileStats(data) {
   console.log(_.keys(data.locations[1]));
 
   var tss = _.pluck(data.locations, "timestamp");
-  console.log("tss", tss);
+  // console.log("tss", tss);
   console.log("First date:", tss.slice().pop());
   console.log(new Date(tss.slice().pop()));
   console.log("Last date:", tss.slice().shift());
