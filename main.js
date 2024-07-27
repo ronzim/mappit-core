@@ -9,7 +9,7 @@ const argv = require("yargs").array("filterdate").array("filterspace").argv;
 // --loadfile : load positions from file
 // --filterdate [start, end] : filter by date
 // --TODO filterspace [lat_max, lat_min, lng_max, lng_min] : filter by position
-// --plot byActivityType/byVelocity/heatmap : prepare data to be rendered in each format
+// --plot byactivitytype/byvelocity/heatmap : prepare data to be rendered in each format
 // --render : render plot using electron
 // --writeOutput : write filtered data to file
 

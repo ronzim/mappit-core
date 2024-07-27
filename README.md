@@ -10,6 +10,14 @@ google locations plot tool with command line interface
 
 $ npm start -- --loadfile ./Takeout/location_history/Records.json --filterdate '2022-08-06' '2022-08-17' --plot heatmap --render
 
+// IMPLEMENTED CLI COMMANDS:
+// --loadfile : load positions from file
+// --filterdate [start, end] : filter by date
+// --TODO filterspace [lat_max, lat_min, lng_max, lng_min] : filter by position
+// --plot byactivitytype/byvelocity/heatmap : prepare data to be rendered in each format
+// --render : render plot using electron
+// --writeOutput : write filtered data to file
+
 ## Google's description of location_history.json
 
 Di seguito puoi trovare tutti i formati possibili inviati al tuo archivio:
@@ -38,6 +46,8 @@ Il file Cronologia delle posizioni JSON descrive i segnali relativi alla posizio
 -platform(string): la piattaforma che descrive il dispositivo e varie informazioni sulla build.  
 -platformType(string): il tipo di piattaforma del dispositivo, che può essere ANDROID, IOS o UNKNOWN.  
 locationMetadata: un elenco ripetuto di ricerche di reti Wi-Fi formate da punti di accesso. Ogni punto di accesso è formato dall'intensità del segnale in dBm (decibel per milliwat) e dal proprio indirizzo MAC.
+
+Vedi anche https://locationhistoryformat.com/
 
 ### KML
 
