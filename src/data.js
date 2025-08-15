@@ -57,8 +57,8 @@ function simplifyData(locations) {
   return locations.map(location => {
     const simplified = {
       timestamp: location.timestamp,
-      latitude: location.latitudeE7 / 1e7,
-      longitude: location.longitudeE7 / 1e7,
+      latitudeE7: location.latitudeE7,
+      longitudeE7: location.longitudeE7,
       velocity: location.velocity || null,
       heading: location.heading || null,
       activity: location.activity ? location.activity[0].activity.map(act => act.type) : null
