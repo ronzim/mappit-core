@@ -53,7 +53,7 @@ function plotByVelocity(sourceData) {
 
   var layout = {
     autosize: true,
-    heigth: 2000,
+    height: 2000,
     width: 1200,
     hovermode: "closest",
     mapbox: {
@@ -96,7 +96,7 @@ function scatterRaw(sourceData) {
 
   var layout = {
     autosize: true,
-    heigth: 2000,
+    height: 2000,
     width: 1200,
     hovermode: "closest",
     mapbox: {
