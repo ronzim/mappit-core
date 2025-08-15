@@ -1,0 +1,44 @@
+{
+  "locations": [
+    {
+      "timestamp": "2022-08-06T10:00:00.000Z",
+      "latitudeE7": 454225900,
+      "longitudeE7": 91864100,
+      "accuracy": 10,
+      "velocity": 10,
+      "heading": 90,
+      "altitude": 120,
+      "verticalAccuracy": 10,
+      "activity": [
+        {
+          "activity": [
+            {
+              "type": "IN_PASSENGER_VEHICLE",
+              "confidence": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2022-08-06T11:00:00.000Z",
+      "latitudeE7": 454226000,
+      "longitudeE7": 91865200,
+      "accuracy": 10,
+      "velocity": 5,
+      "heading": 180,
+      "altitude": 120,
+      "verticalAccuracy": 10,
+      "activity": [
+        {
+          "activity": [
+            {
+              "type": "WALKING",
+              "confidence": 100
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
