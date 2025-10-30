@@ -34,7 +34,7 @@ function normalize(array) {
   return array;
 }
 
-function countBros(d1, n, arr) {
+function countNearbyPoints(d1, arr) {
   const counts = arr.reduce(
     (acc, d2) => {
       const category = distance(d1, d2) < 1000 ? "near" : "far";
@@ -54,5 +54,5 @@ function mean(array) {
 exports.degToRad = degToRad;
 exports.distance = distance;
 exports.normalize = normalize;
-exports.countBros = countBros;
+exports.countNearbyPoints = countNearbyPoints;
 exports.mean = mean;

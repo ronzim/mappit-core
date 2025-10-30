@@ -24,11 +24,15 @@ function createWindow(data) {
   console.log("filters", argv, argv.filter);
 
   // Create the browser window.
+  // Note: nodeIntegration is enabled for local file processing.
+  // This is acceptable for a local-only tool but should be refactored
+  // to use contextBridge and preload scripts for better security.
   let win = new BrowserWindow({
     width: mainScreen.workAreaSize.width,
     height: mainScreen.workAreaSize.height,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
 
@@ -44,22 +48,33 @@ function createWindow(data) {
 }
 
 async function main() {
-  console.log("starting...");
-  console.log(argv);
+  try {
+    console.log("starting...");
+    console.log(argv);
 
-  const rawData = await loadData(argv.loadfile);
+    if (!argv.loadfile) {
+      console.error("Error: --loadfile parameter is required");
+      app.quit();
+      return;
+    }
 
-  const filteredData = filterData(rawData, argv.filterdate);
+    const rawData = await loadData(argv.loadfile);
 
-  if (argv.writeOutput) {
-    const simplifiedData = simplifyData(filteredData);
-    fs.writeJsonSync(argv.writeOutput, { locations: simplifiedData });
-  }
+    const filteredData = filterData(rawData, argv.filterdate);
 
-  if (argv.render) {
-    const plotData = prepareData(filteredData, argv.plot);
-    createWindow(plotData);
-  } else {
+    if (argv.writeOutput) {
+      const simplifiedData = simplifyData(filteredData);
+      fs.writeJsonSync(argv.writeOutput, { locations: simplifiedData });
+    }
+
+    if (argv.render) {
+      const plotData = prepareData(filteredData, argv.plot);
+      createWindow(plotData);
+    } else {
+      app.quit();
+    }
+  } catch (error) {
+    console.error("Error in main:", error);
     app.quit();
   }
 }
