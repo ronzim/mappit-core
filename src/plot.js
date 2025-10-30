@@ -3,6 +3,11 @@ const { viridis_mod } = require("./defaults.js");
 
 function prepareData(timeSpanData, type) {
   console.log("preparing plot... size: ", timeSpanData.length);
+  
+  if (!Array.isArray(timeSpanData) || timeSpanData.length === 0) {
+    throw new Error("No data to plot");
+  }
+  
   console.time("preparing plot");
   let plot;
   switch (type) {
@@ -33,7 +38,6 @@ function plotByVelocity(sourceData) {
   ];
 
   const velocities = sourceData.map(loc => loc.velocity);
-  const colors = velocities.map(v => v); // Not sure what the original intent was here
 
   var trace = {
     type: "scattermapbox",
@@ -42,7 +46,7 @@ function plotByVelocity(sourceData) {
     mode: "markers",
     marker: {
       size: 5,
-      color: colors,
+      color: velocities,
       colorscale: scl,
       showscale: true
     },
