@@ -5,7 +5,7 @@ function prepareData(timeSpanData, type) {
   console.log("preparing plot... size: ", timeSpanData.length);
   
   if (!Array.isArray(timeSpanData) || timeSpanData.length === 0) {
-    throw new Error("No data to plot");
+    throw new Error("No valid location data to plot: timeSpanData must be a non-empty array");
   }
   
   console.time("preparing plot");
