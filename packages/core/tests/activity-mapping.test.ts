@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   getGroupedActivityType,
   activityGroupMapping,
-} from './activity-mapping';
+} from '../src/activity-mapping';
 
 describe('activityGroupMapping', () => {
   it('has UNKNOWN as a group', () => {

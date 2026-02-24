@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { parseRecords } from './records';
+import { parseRecords } from '../../src/loaders/records';
 
 const fixture = JSON.parse(
   fs.readFileSync(
