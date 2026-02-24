@@ -138,37 +138,37 @@ interface MappitDataset {
 
 > **Obiettivo**: il core sa caricare e normalizzare tutti e 5 i formati in `MappitDataset`.
 
-- [ ] **1.1** Portare `src/utils.js` → `packages/core/src/geo.ts` (haversine, degToRad, mean, normalize)
-- [ ] **1.2** Portare `src/defaults.js` → `packages/core/src/constants.ts` (colorscale, activity mapping)
-- [ ] **1.3** Creare `packages/core/src/types.ts` con le interfacce del modello dati unificato
-- [ ] **1.4** Creare `packages/core/src/activity-mapping.ts` — estrarre `activityGroupMapping` e `getGroupedActivityType` da `timeline.html`
-- [ ] **1.5** Creare `packages/core/src/loaders/records-loader.ts`
+- [x] **1.1** Portare `src/utils.js` → `packages/core/src/geo.ts` (haversine, degToRad, mean, normalize)
+- [x] **1.2** Portare `src/defaults.js` → `packages/core/src/constants.ts` (colorscale, activity mapping)
+- [x] **1.3** Creare `packages/core/src/types.ts` con le interfacce del modello dati unificato
+- [x] **1.4** Creare `packages/core/src/activity-mapping.ts` — estrarre `activityGroupMapping` e `getGroupedActivityType` da `timeline.html`
+- [x] **1.5** Creare `packages/core/src/loaders/records.ts`
   - Carica Records.json (streaming con big-json per file grandi, JSON.parse per file piccoli)
   - Normalizza ogni location in `LocationPoint`
   - Produce un `MappitDataset` con `source: 'records'` e il campo `points` popolato
-- [ ] **1.6** Creare `packages/core/src/loaders/timeline-standard-loader.ts`
+- [x] **1.6** Creare `packages/core/src/loaders/timeline-standard.ts`
   - Carica `{ timelineObjects: [...] }`
   - Normalizza `placeVisit` → `PlaceVisit`, `activitySegment` → `ActivitySegment`
   - Popola `timeline` nel `MappitDataset`
-- [ ] **1.7** Creare `packages/core/src/loaders/timeline-semantic-loader.ts`
+- [x] **1.7** Creare `packages/core/src/loaders/timeline-semantic.ts`
   - Gestisce `{ semanticSegments: [...] }`
   - Parsifica le coordinate `"45.123°, 9.456°"` e la `timelinePath`
   - Associa i punti del path ai segmenti di attività (logica del pointer ottimizzato già presente in timeline.html)
-- [ ] **1.8** Creare `packages/core/src/loaders/timeline-ios-loader.ts`
+- [x] **1.8** Creare `packages/core/src/loaders/timeline-ios.ts`
   - Gestisce il formato array iOS
   - Preprocessa `timelinePath` con offset in minuti
   - Trasforma `visit`/`activity` nel modello unificato
-- [ ] **1.9** Creare `packages/core/src/loaders/takeout-monthly-loader.ts`
+- [x] **1.9** Creare `packages/core/src/loaders/takeout-monthly.ts`
   - Scansiona una directory per file `YYYY_MONTH.json`
   - Riutilizza il loader Standard per ciascun file
   - Concatena i risultati
-- [ ] **1.10** Creare `packages/core/src/loaders/auto-detect.ts`
+- [x] **1.10** Creare `packages/core/src/loaders/auto-detect.ts`
   - Dato un file o directory, rileva automaticamente il formato
   - Se è un singolo JSON: ispeziona la struttura (array? `timelineObjects`? `semanticSegments`? `locations`?)
   - Se è una directory: cerca `Timeline.json` al top level, altrimenti scansiona per file mensili
   - Restituisce il `MappitDataset` appropriato
-- [ ] **1.11** Scrivere test unitari per ogni loader con fixture dei rispettivi formati
-- [ ] **1.12** Creare `packages/core/src/index.ts` — export pubblico della libreria
+- [x] **1.11** Scrivere test unitari per ogni loader con fixture dei rispettivi formati
+- [x] **1.12** Aggiornare `packages/core/src/index.ts` — export pubblico della libreria
 
 **Deliverable**: `import { loadDataset } from 'mappit-core'` funziona con tutti i formati.
 
