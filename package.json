@@ -1,23 +1,23 @@
 {
-  "name": "MappIt",
+  "name": "mappit-monorepo",
   "version": "0.1.0",
-  "description": "",
-  "main": "src/main.js",
-  "dev": true,
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "electron src/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint packages/*/src",
+    "format": "prettier --write \"packages/*/src/**/*.ts\"",
+    "legacy:start": "electron src/main.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "big-json": "^3.1.0",
-    "electron": "^9.4.0",
-    "fs-extra": "^10.1.0",
-    "plotly.js-dist": "^1.52.2",
-    "simple-statistics": "^7.0.8",
-    "stream-json": "^1.7.4",
-    "yargs": "^15.1.0"
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
   }
 }

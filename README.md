@@ -1,78 +1,222 @@
-# mappit-core
+# MappIt
 
-google locations plot tool with command line interface
+Strumenti per caricare, filtrare e visualizzare i dati di Google Location History scaricati da Google Takeout.
 
-## install
+Il repository è un **monorepo npm workspaces** composto da due package:
 
-`npm install`
+| Package       | Percorso         | Descrizione                                                                                           |
+| ------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
+| `mappit-core` | `packages/core/` | Libreria Node.js + CLI. Carica, normalizza e filtra dati di localizzazione da tutti i formati Google. |
+| `mappit-app`  | `packages/app/`  | App Electron per la visualizzazione (in sviluppo — vedi [ROADMAP.md](ROADMAP.md)).                    |
 
-## example usage
+---
 
-$ npm start -- --loadfile ./Takeout/location_history/Records.json --filterdate '2022-08-06' '2022-08-17' --plot heatmap --render
+## Prerequisiti
 
-// IMPLEMENTED CLI COMMANDS:
-// --loadfile : load positions from file
-// --filterdate [start, end] : filter by date
-// --TODO filterspace [lat_max, lat_min, lng_max, lng_min] : filter by position
-// --plot byactivitytype/byvelocity/heatmap : prepare data to be rendered in each format
-// --render : render plot using electron
-// --writeOutput : write filtered data to file
+- Node.js ≥ 18
+- npm ≥ 10
 
-## Google's description of location_history.json
+---
 
-Di seguito puoi trovare tutti i formati possibili inviati al tuo archivio:
-Cronologia delle posizioni
-Dati sulla posizione raccolti durante l'adesione alla Cronologia delle posizioni.
+## Installazione
 
-### JSON
+```bash
+# Clona il repo e installa tutte le dipendenze di entrambi i package
+npm install
+```
 
-Il file Cronologia delle posizioni JSON descrive i segnali relativi alla posizione del dispositivo e i metadati associati raccolti mentre la Cronologia delle posizioni era attiva e che non hai successivamente eliminato.
+---
 
--locations: tutti i record di posizione.  
--timestampMs(int64): timestamp (UTC) in millisecondi per la posizione registrata. -> è diventato `timestamp` espresso in stringa ISO
--latitudeE7(int32): il valore di latitudine della posizione in formato E7 (gradi moltiplicati per 10^7 e arrotondati al numero intero più vicino).  
--longitudeE7(int32): il valore di longitudine della posizione in formato E7 (gradi moltiplicati per 10^7 e arrotondati al numero intero più vicino).  
--accuracy(int32): raggio approssimativo di precisione della posizione in metri.  
--velocity(int32): velocità in metri al secondo.  
--heading(int32): gradi a est del nord geografico.  
--altitude(int32): metri sopra l'ellissoide di riferimento WGS84.  
--verticalAccuracy(int32): precisione verticale calcolata in metri.  
--activity: informazioni sull'attività svolta nella posizione.  
--timestampMs(int64): timestamp (UTC) in millisecondi per l'attività registrata.  
--type: descrizione del tipo di attività.  
--confidence(int32): affidabilità associata al tipo di attività specificato.  
--source(string): l'origine da cui è stata recuperata la posizione, generalmente GPS, CELL o WIFI.  
--deviceTag(int32): un identificatore intero (specifico della Cronologia delle posizioni) associato al dispositivo che ha caricato la posizione.  
--platform(string): la piattaforma che descrive il dispositivo e varie informazioni sulla build.  
--platformType(string): il tipo di piattaforma del dispositivo, che può essere ANDROID, IOS o UNKNOWN.  
-locationMetadata: un elenco ripetuto di ricerche di reti Wi-Fi formate da punti di accesso. Ogni punto di accesso è formato dall'intensità del segnale in dBm (decibel per milliwat) e dal proprio indirizzo MAC.
+## `mappit-core` — Libreria e CLI
 
-Vedi anche https://locationhistoryformat.com/
+### Sviluppo
 
-### KML
+```bash
+# Compila in watch mode (rigenera dist/ ad ogni modifica)
+npm run dev --workspace=packages/core
 
-Un file KML memorizza informazioni sulla modellazione geografica in formato XML che possono essere usate per mostrare dati geografici. Per ulteriori informazioni, consulta la documentazione su KML. Puoi caricare il file KML in Google Earth per visualizzare tutte le località che hai visitato.
+# Oppure dalla cartella del package
+cd packages/core
+npm run dev
+```
 
-### Cronologia delle posizioni semantica
+La build produce output CommonJS in `packages/core/dist/`.
 
-Cronologia delle posizioni semantica composta da segmenti relativi ad attività e visite a luoghi dedotte.
+```bash
+# Esegui i test in watch mode
+npm run test:watch --workspace=packages/core
 
-### JSON
+# Esegui i test una volta sola
+npm run test --workspace=packages/core
 
-I file JSON della cronologia delle posizioni semantica descrivono gli oggetti della cronologia di Google, come segmenti relativi ad attività e visite a luoghi dedotte tra le visite ai luoghi.
+# Controlla solo i tipi senza emettere file
+npm run typecheck --workspace=packages/core
+```
+
+### Build di produzione
+
+```bash
+npm run build --workspace=packages/core
+# oppure da root, per tutti i package in una volta:
+npm run build
+```
+
+L'output viene emesso in `packages/core/dist/`:
+
+```
+dist/
+├── index.js      ← entry point della libreria
+├── index.d.ts    ← dichiarazioni TypeScript
+├── cli.js        ← entry point della CLI
+└── ...           ← sorgenti compilati dei moduli interni
+```
+
+### Uso come libreria
+
+```js
+// CommonJS
+const { loadDataset, filterByDateRange } = require('mappit-core');
+
+// TypeScript / ESM (dopo build)
+import { loadDataset, filterByDateRange } from 'mappit-core';
+
+const dataset = await loadDataset('./Takeout/Location History');
+const filtered = filterByDateRange(dataset, '2024-01-01', '2024-06-30');
+```
+
+> **Nota**: l'implementazione completa dei loader e dei filtri è pianificata nella Fase 1–2. Vedi [ROADMAP.md](ROADMAP.md).
+
+### Uso da CLI
+
+Dopo la build, il comando `mappit-core` è disponibile tramite `npx`:
+
+```bash
+# Auto-detect del formato (Records.json, Timeline.json, cartella Takeout)
+npx mappit-core load ./path/to/data
+
+# Filtra per data
+npx mappit-core load ./data --filter-date 2024-01-01 2024-06-30
+
+# Filtra per area geografica (bounding box: lat_min,lng_min,lat_max,lng_max)
+npx mappit-core load ./data --filter-area 45.0,9.0,46.0,10.0
+
+# Filtra per tipo di attività
+npx mappit-core load ./data --filter-activity WALKING,CYCLING
+
+# Mostra statistiche
+npx mappit-core load ./data --stats
+
+# Esportazione
+npx mappit-core load ./data --filter-date 2024-01-01 2024-06-30 --export output.json
+npx mappit-core load ./data --filter-date 2024-01-01 2024-06-30 --export output.kml
+```
+
+> **Nota**: la CLI completa è pianificata nella Fase 3. Per ora stampa solo un messaggio placeholder.
+
+### Formati dati supportati
+
+| Formato                                       | Rilevamento automatico                                |
+| --------------------------------------------- | ----------------------------------------------------- |
+| `Records.json` (legacy, pre-2024)             | presenza di `{ locations: [...] }`                    |
+| `Timeline.json` Standard                      | presenza di `{ timelineObjects: [...] }`              |
+| `Timeline.json` Semantic                      | presenza di `{ semanticSegments: [...] }`             |
+| `Timeline.json` iOS                           | struttura ad array `[{ startTime, visit\|activity }]` |
+| File mensili Takeout (`2024_JANUARY.json`, …) | directory con file `YYYY_MONTH.json`                  |
+
+---
+
+## `mappit-app` — App Electron
+
+> **Stato attuale**: placeholder — l'implementazione è pianificata dalla Fase 4 in poi. Vedi [ROADMAP.md](ROADMAP.md).
+
+### Sviluppo (futuro)
+
+```bash
+cd packages/app
+npm run dev
+```
+
+### Build di produzione (futuro)
+
+```bash
+cd packages/app
+npm run build
+
+# Pacchettizzazione con electron-builder
+npm run dist
+```
+
+---
+
+## Script dal root del monorepo
+
+```bash
+npm run build        # build di tutti i package
+npm run test         # test di tutti i package
+npm run lint         # ESLint su tutti i sorgenti TypeScript
+npm run format       # Prettier su tutti i sorgenti TypeScript
+npm run legacy:start # avvia la vecchia app Electron+Plotly (pre-ristrutturazione)
+```
+
+---
+
+## Fixtures di test
+
+La cartella `fixtures/` contiene file di esempio per ogni formato, usati dai test unitari:
+
+```
+fixtures/
+├── records.json            ← Records.json (formato legacy)
+├── timeline-standard.json  ← Timeline.json con timelineObjects
+├── timeline-semantic.json  ← Timeline.json con semanticSegments
+├── timeline-ios.json       ← Timeline.json formato iOS (array)
+└── 2024_JANUARY.json       ← file mensile Takeout
+```
+
+---
+
+## Struttura del repo
+
+```
+mappit-core/
+├── packages/
+│   ├── core/               ← mappit-core (libreria + CLI)
+│   │   ├── src/
+│   │   ├── dist/           ← output build (gitignored)
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── vitest.config.ts
+│   └── app/                ← mappit-app (Electron)
+│       ├── src/
+│       ├── package.json
+│       └── tsconfig.json
+├── fixtures/               ← dati di test per tutti i formati
+├── src/                    ← codice legacy (pre-ristrutturazione)
+├── timeline.html           ← viewer HTML standalone (pre-ristrutturazione)
+├── tsconfig.base.json      ← tsconfig condiviso
+├── eslint.config.js
+├── .prettierrc
+├── package.json            ← workspace root
+└── ROADMAP.md              ← piano di sviluppo dettagliato
+```
+
+---
+
+## Formati dati Google — Riferimento
+
+Per la specifica completa dei formati di esportazione di Google Location History, vedi [locationhistoryformat.com](https://locationhistoryformat.com/).
+
+Riepilogo dei campi principali:
+
+- **`latitudeE7` / `longitudeE7`**: coordinate in formato E7 (gradi × 10⁷, intero)
+- **`timestamp`**: ISO 8601 UTC
+- **`velocity`**: m/s
+- **`accuracy`**: raggio in metri
+- **`placeVisit`**: visita a un luogo con `placeId`, `duration`, `location`
+- **`activitySegment`**: spostamento con `activityType`, `duration`, `simplifiedRawPath`
+
+---
 
 ## Roadmap
 
-The idea could be to have a node-friendly library to reduce data amount (eg simply filtering on date), and then a webapp / electron app to render the data.
-
-- [x] Manage big json data (bigger than 500 MB)
-- [ ] Replace plotly with deck.gl
-- [ ] Download canvas and result data
-- [ ] Show progress bar https://github.com/npkgz/cli-progress
-- [ ] Reworking plot types
-- [ ] Merge multiple Records.json
-
-## Hints
-
-- Mapbox styles
-- Plotly or deckgl?
+Vedi [ROADMAP.md](ROADMAP.md) per il piano dettagliato suddiviso in fasi.

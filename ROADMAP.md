@@ -59,7 +59,7 @@ interface LocationPoint {
 
 // Una visita a un luogo
 interface PlaceVisit {
-  type: "visit";
+  type: 'visit';
   startTime: string;
   endTime: string;
   lat: number;
@@ -72,7 +72,7 @@ interface PlaceVisit {
 
 // Un segmento di attività (spostamento)
 interface ActivitySegment {
-  type: "activity";
+  type: 'activity';
   startTime: string;
   endTime: string;
   activityType: string; // normalizzato tramite activityGroupMapping
@@ -88,11 +88,11 @@ type TimelineEntry = PlaceVisit | ActivitySegment;
 // Dataset completo caricato
 interface MappitDataset {
   source:
-    | "records"
-    | "timeline-standard"
-    | "timeline-semantic"
-    | "timeline-ios"
-    | "takeout-monthly";
+    | 'records'
+    | 'timeline-standard'
+    | 'timeline-semantic'
+    | 'timeline-ios'
+    | 'takeout-monthly';
   dateRange: { min: string; max: string };
   // Per Records.json: array di punti grezzi
   points: LocationPoint[];
@@ -109,7 +109,7 @@ interface MappitDataset {
 
 > **Obiettivo**: struttura monorepo, tooling moderno, nessuna funzionalità nuova.
 
-- [ ] **0.1** Inizializzare un monorepo con workspace npm
+- [x] **0.1** Inizializzare un monorepo con workspace npm
   ```
   mappit-core/
   ├── packages/
@@ -124,11 +124,11 @@ interface MappitDataset {
   ├── package.json       ← workspace root
   └── tsconfig.base.json
   ```
-- [ ] **0.2** Configurare TypeScript per entrambi i package (target ES2020+, strict mode)
-- [ ] **0.3** Configurare ESLint + Prettier condivisi
-- [ ] **0.4** Configurare Vitest (o Jest) come test runner per il core
-- [ ] **0.5** Aggiungere script di build (`tsc` o `tsup`) per il core → output CommonJS + ESM
-- [ ] **0.6** Spostare `Records.json` di test in una cartella `fixtures/` condivisa; creare anche fixture per gli altri formati (Standard, Semantic, iOS, monthly)
+- [x] **0.2** Configurare TypeScript per entrambi i package (target ES2020+, strict mode)
+- [x] **0.3** Configurare ESLint + Prettier condivisi
+- [x] **0.4** Configurare Vitest come test runner per il core
+- [x] **0.5** Aggiungere script di build (`tsc`) per il core → output CommonJS
+- [x] **0.6** Creare cartella `fixtures/` con dati di test per tutti i formati (records, standard, semantic, iOS, monthly)
 
 **Deliverable**: repo compilabile, nessuna funzionalità ancora migrata.
 

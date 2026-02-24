@@ -1,0 +1,81 @@
+{
+    "locations": [
+        {
+            "timestamp": "2024-01-15T10:00:00.000Z",
+            "latitudeE7": 454225900,
+            "longitudeE7": 91864100,
+            "accuracy": 15,
+            "velocity": 5,
+            "heading": 90,
+            "altitude": 120,
+            "verticalAccuracy": 5,
+            "source": "GPS",
+            "activity": [
+                {
+                    "activity": [
+                        {
+                            "type": "WALKING",
+                            "confidence": 85
+                        },
+                        {
+                            "type": "ON_FOOT",
+                            "confidence": 90
+                        }
+                    ],
+                    "timestamp": "2024-01-15T10:00:01.000Z"
+                }
+            ]
+        },
+        {
+            "timestamp": "2024-01-15T10:05:00.000Z",
+            "latitudeE7": 454280000,
+            "longitudeE7": 91920000,
+            "accuracy": 10,
+            "velocity": 4,
+            "heading": 85,
+            "altitude": 118,
+            "source": "GPS"
+        },
+        {
+            "timestamp": "2024-01-15T10:30:00.000Z",
+            "latitudeE7": 454500000,
+            "longitudeE7": 92100000,
+            "accuracy": 20,
+            "velocity": 40,
+            "heading": 270,
+            "altitude": 130,
+            "source": "WIFI",
+            "activity": [
+                {
+                    "activity": [
+                        {
+                            "type": "IN_PASSENGER_VEHICLE",
+                            "confidence": 95
+                        }
+                    ],
+                    "timestamp": "2024-01-15T10:30:01.000Z"
+                }
+            ]
+        },
+        {
+            "timestamp": "2024-01-15T11:00:00.000Z",
+            "latitudeE7": 454700000,
+            "longitudeE7": 91700000,
+            "accuracy": 8,
+            "velocity": 0,
+            "altitude": 122,
+            "source": "GPS",
+            "activity": [
+                {
+                    "activity": [
+                        {
+                            "type": "STILL",
+                            "confidence": 99
+                        }
+                    ],
+                    "timestamp": "2024-01-15T11:00:01.000Z"
+                }
+            ]
+        }
+    ]
+}

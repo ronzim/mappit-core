@@ -1,0 +1,91 @@
+{
+    "timelineObjects": [
+        {
+            "placeVisit": {
+                "location": {
+                    "latitudeE7": 454225900,
+                    "longitudeE7": 91864100,
+                    "placeId": "ChIJexample_duomo",
+                    "name": "Duomo di Milano",
+                    "address": "Piazza del Duomo, 20122 Milano MI, Italy"
+                },
+                "duration": {
+                    "startTimestamp": "2024-01-15T10:00:00Z",
+                    "endTimestamp": "2024-01-15T11:30:00Z"
+                },
+                "editConfirmationStatus": "CONFIRMED",
+                "visitConfidence": 95
+            }
+        },
+        {
+            "activitySegment": {
+                "startLocation": {
+                    "latitudeE7": 454225900,
+                    "longitudeE7": 91864100
+                },
+                "endLocation": {
+                    "latitudeE7": 454700000,
+                    "longitudeE7": 91700000
+                },
+                "duration": {
+                    "startTimestamp": "2024-01-15T11:30:00Z",
+                    "endTimestamp": "2024-01-15T12:00:00Z"
+                },
+                "distance": 3850,
+                "activityType": "WALKING",
+                "confidence": "HIGH",
+                "activities": [
+                    {
+                        "activityType": "WALKING",
+                        "probability": 92.5
+                    },
+                    {
+                        "activityType": "ON_FOOT",
+                        "probability": 5.0
+                    }
+                ],
+                "simplifiedRawPath": {
+                    "points": [
+                        {
+                            "latE7": 454225900,
+                            "lngE7": 91864100,
+                            "timestampMs": "1705318200000"
+                        },
+                        {
+                            "latE7": 454350000,
+                            "lngE7": 91800000,
+                            "timestampMs": "1705318800000"
+                        },
+                        {
+                            "latE7": 454500000,
+                            "lngE7": 91750000,
+                            "timestampMs": "1705319400000"
+                        },
+                        {
+                            "latE7": 454700000,
+                            "lngE7": 91700000,
+                            "timestampMs": "1705320000000"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "placeVisit": {
+                "location": {
+                    "latitudeE7": 454700000,
+                    "longitudeE7": 91700000,
+                    "placeId": "ChIJexample_parco",
+                    "name": "Parco Sempione",
+                    "address": "Parco Sempione, Milano MI, Italy"
+                },
+                "duration": {
+                    "startTimestamp": "2024-01-15T12:00:00Z",
+                    "endTimestamp": "2024-01-15T13:30:00Z"
+                },
+                "editConfirmationStatus": "NOT_CONFIRMED",
+                "visitConfidence": 78
+            }
+        }
+    ]
+}

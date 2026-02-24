@@ -1,0 +1,20 @@
+{
+    "name": "mappit-app",
+    "version": "0.1.0",
+    "description": "Electron app for visualizing Google Location History",
+    "private": true,
+    "main": "dist/main/main.js",
+    "scripts": {
+        "dev": "echo \"Electron dev setup coming in Phase 4\"",
+        "build": "tsc --noEmit",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "mappit-core": "*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.13.4",
+        "electron": "^33.4.0",
+        "electron-builder": "^25.1.8"
+    }
+}

@@ -1,0 +1,71 @@
+{
+    "timelineObjects": [
+        {
+            "placeVisit": {
+                "location": {
+                    "latitudeE7": 454225900,
+                    "longitudeE7": 91864100,
+                    "placeId": "ChIJexample_duomo",
+                    "name": "Duomo di Milano",
+                    "address": "Piazza del Duomo, 20122 Milano MI, Italy"
+                },
+                "duration": {
+                    "startTimestamp": "2024-01-08T09:00:00Z",
+                    "endTimestamp": "2024-01-08T10:30:00Z"
+                },
+                "editConfirmationStatus": "CONFIRMED",
+                "visitConfidence": 92
+            }
+        },
+        {
+            "activitySegment": {
+                "startLocation": {
+                    "latitudeE7": 454225900,
+                    "longitudeE7": 91864100
+                },
+                "endLocation": {
+                    "latitudeE7": 454700000,
+                    "longitudeE7": 91700000
+                },
+                "duration": {
+                    "startTimestamp": "2024-01-08T10:30:00Z",
+                    "endTimestamp": "2024-01-08T11:10:00Z"
+                },
+                "distance": 3850,
+                "activityType": "IN_PASSENGER_VEHICLE",
+                "confidence": "HIGH",
+                "simplifiedRawPath": {
+                    "points": [
+                        {
+                            "latE7": 454225900,
+                            "lngE7": 91864100
+                        },
+                        {
+                            "latE7": 454450000,
+                            "lngE7": 91780000
+                        },
+                        {
+                            "latE7": 454700000,
+                            "lngE7": 91700000
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "placeVisit": {
+                "location": {
+                    "latitudeE7": 454700000,
+                    "longitudeE7": 91700000,
+                    "placeId": "ChIJexample_parco",
+                    "name": "Parco Sempione"
+                },
+                "duration": {
+                    "startTimestamp": "2024-01-08T11:10:00Z",
+                    "endTimestamp": "2024-01-08T12:30:00Z"
+                },
+                "editConfirmationStatus": "NOT_CONFIRMED"
+            }
+        }
+    ]
+}
