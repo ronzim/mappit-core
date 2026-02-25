@@ -25,6 +25,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "ora": "^5.4.1",
         "stream-json": "^1.7.4",
         "yargs": "^17.7.2"
     },

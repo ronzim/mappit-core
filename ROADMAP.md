@@ -202,7 +202,7 @@ interface MappitDataset {
 
 > **Obiettivo**: la libreria è utilizzabile da terminale.
 
-- [ ] **3.1** Creare `packages/core/src/cli.ts` con yargs/commander
+- [x] **3.1** Creare `packages/core/src/cli.ts` con yargs
   ```
   mappit-core load <path>                 # auto-detect formato
   mappit-core load <path> --format records
@@ -213,12 +213,12 @@ interface MappitDataset {
   mappit-core load <path> --export output.kml
   mappit-core load <path> --stats
   ```
-- [ ] **3.2** Aggiungere campo `bin` in `packages/core/package.json`
-- [ ] **3.3** Aggiungere progress bar (cli-progress o ora) per operazioni lunghe
-- [ ] **3.4** Test e2e per la CLI
-- [ ] **3.5** Documentare la migrazione dai comandi legacy (`--loadfile`, `--filterdate`, `--plot`, `--writeOutput`) alla nuova CLI nel README
+- [x] **3.2** Campo `bin` in `packages/core/package.json` (già presente dal Phase 0)
+- [x] **3.3** Aggiungere spinner (ora@5) per operazioni di caricamento, filtro ed export
+- [x] **3.4** Test e2e per la CLI (17 test in `tests/cli.test.ts`)
+- [x] **3.5** Documentare la migrazione dai comandi legacy (`--loadfile`, `--filterdate`, `--plot`, `--writeOutput`) alla nuova CLI nel README
 
-**Deliverable**: `npx mappit-core load ./Takeout --stats` funziona.
+**Deliverable**: `npx mappit-core load ./Takeout --stats` funziona. ✅
 
 ---
 

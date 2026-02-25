@@ -187,4 +187,33 @@ Registro delle scelte tecniche adottate durante la ristrutturazione del progetto
 
 ---
 
-_Ultimo aggiornamento: 2026-02-25_
+## CLI (Fase 3)
+
+### yargs come framework CLI
+
+- **Decisione**: usato yargs (già presente come dipendenza dal Phase 0) per il parsing degli argomenti.
+- **Motivazione**: API matura, supporto sottomandi, type-safe con `@types/yargs`, già familiare dal progetto legacy.
+
+### ora@5 per spinner (non v6+)
+
+- **Decisione**: installato `ora@5` invece della v6/v7 più recente.
+- **Motivazione**: ora v6+ è ESM-only. Il progetto core emette CommonJS (`"module": "CommonJS"` in tsconfig). La v5 è l'ultima versione con supporto `require()`.
+
+### `run()` esportata e accetta `argv` opzionale
+
+- **Decisione**: la funzione `run(argv?)` è esportata e accetta un array di argomenti opzionale (default: `process.argv`).
+- **Motivazione**: permette test e2e tramite `execFileSync` e in futuro l'invocazione programmatica.
+
+### Spinner su stdout
+
+- **Decisione**: `ora({ stream: process.stdout })` invece del default `process.stderr`.
+- **Motivazione**: unifica l'output del spinner (messaggi succeed/fail) con il summary stampato da `console.log`, rendendo i test e2e più semplici (basta catturare stdout).
+
+### Test e2e via child_process
+
+- **Decisione**: i test CLI (`tests/cli.test.ts`) lanciano il binario compilato con `execFileSync` e controllano stdout e file generati.
+- **Motivazione**: testa l'intera catena (parsing args → load → filter → export → output) come un utente reale, senza mock.
+
+---
+
+_Ultimo aggiornamento: 2026-06-26_

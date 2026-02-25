@@ -111,7 +111,40 @@ npx mappit-core load ./data --filter-date 2024-01-01 2024-06-30 --export output.
 npx mappit-core load ./data --filter-date 2024-01-01 2024-06-30 --export output.kml
 ```
 
-> **Nota**: la CLI completa è pianificata nella Fase 3. Per ora stampa solo un messaggio placeholder.
+Tutte le opzioni:
+
+```
+mappit-core load <path>
+
+Positionals:
+  path  Percorso a un file JSON o directory Takeout         [string] [required]
+
+Options:
+  -f, --format           Forza un formato specifico (auto-detect di default)
+         [string] [choices: records, timeline-standard, timeline-semantic,
+                                                                 timeline-ios]
+  -d, --filter-date      Filtra per intervallo date (due date ISO)       [array]
+  -a, --filter-area      Filtra per bounding box: south,west,north,east [string]
+      --filter-activity   Filtra per tipo di attività (separati da virgola)
+                                                                        [string]
+  -e, --export           Esporta su file (.json o .kml)                 [string]
+  -s, --stats            Mostra statistiche di riepilogo
+                                                      [boolean] [default: false]
+```
+
+### Migrazione dalla CLI legacy
+
+Se usavi la vecchia CLI basata su Electron (`src/main.js`), ecco la mappatura dei comandi:
+
+| Vecchio comando                          | Nuovo comando                             |
+| ---------------------------------------- | ----------------------------------------- |
+| `--loadfile ./Records.json`              | `load ./Records.json`                     |
+| `--filterdate '2022-08-06' '2022-08-17'` | `--filter-date 2022-08-06 2022-08-17`     |
+| `--filterspace` (non implementato)       | `--filter-area south,west,north,east`     |
+| `--writeOutput`                          | `--export output.json`                    |
+| `--plot heatmap --render`                | (visualizzazione → `mappit-app`, Fase 4+) |
+
+> La vecchia CLI richiedeva Electron per funzionare. La nuova CLI è un programma Node.js puro e non ha dipendenze grafiche.
 
 ### Formati dati supportati
 

@@ -1,6 +1,322 @@
+#!/usr/bin/env node
 /**
  * mappit-core CLI
- * Phase 0 placeholder — full implementation in Phase 3.
+ *
+ * Usage examples:
+ *   mappit-core load <path>                                       # auto-detect & show summary
+ *   mappit-core load <path> --format records
+ *   mappit-core load <path> --filter-date 2024-01-01 2024-06-30
+ *   mappit-core load <path> --filter-area 45.0,9.0,46.0,10.0
+ *   mappit-core load <path> --filter-activity WALKING,CYCLING
+ *   mappit-core load <path> --export output.json
+ *   mappit-core load <path> --export output.kml
+ *   mappit-core load <path> --stats
  */
 
-console.log('mappit-core CLI — coming soon (Phase 3)');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import ora from 'ora';
+
+import { VERSION } from './index';
+import { detectFormat, parseAuto } from './loaders/auto-detect';
+import { parseRecords } from './loaders/records';
+import { parseTimelineStandard } from './loaders/timeline-standard';
+import { parseTimelineSemantic } from './loaders/timeline-semantic';
+import { parseTimelineIos } from './loaders/timeline-ios';
+import { parseTakeoutMonthly } from './loaders/takeout-monthly';
+import { filterByDateRange, filterByArea, filterByActivityType } from './filters';
+import type { BoundingBox } from './filters';
+import { computeSummary, computeYearlySummary } from './stats';
+import { exportToJson } from './exporters/json-exporter';
+import { exportToKml } from './exporters/kml-exporter';
+import type { MappitDataset, DataSource } from './types';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function die(msg: string): never {
+    process.stderr.write(`Error: ${msg}\n`);
+    process.exit(1);
+}
+
+/**
+ * Read a JSON file synchronously or identify a directory for monthly loading.
+ */
+function readInput(filePath: string): { data: unknown; isDirectory: boolean } {
+    const resolved = path.resolve(filePath);
+    if (!fs.existsSync(resolved)) {
+        die(`file or directory not found: ${resolved}`);
+    }
+
+    const stat = fs.statSync(resolved);
+    if (stat.isDirectory()) {
+        return { data: resolved, isDirectory: true };
+    }
+
+    const raw = fs.readFileSync(resolved, 'utf-8');
+    return { data: JSON.parse(raw) as unknown, isDirectory: false };
+}
+
+/**
+ * Load monthly files from a Takeout directory.
+ */
+function loadDirectory(dirPath: string): MappitDataset {
+    const resolved = path.resolve(dirPath);
+    const files = fs.readdirSync(resolved).filter((f) => /^\d{4}_[A-Z]+\.json$/i.test(f));
+
+    if (files.length === 0) {
+        // Fall back: look for a single Timeline.json or Records.json in the dir
+        for (const name of ['Timeline.json', 'Records.json']) {
+            const candidate = path.join(resolved, name);
+            if (fs.existsSync(candidate)) {
+                const raw = fs.readFileSync(candidate, 'utf-8');
+                return parseAuto(JSON.parse(raw) as unknown);
+            }
+        }
+        die(`no supported files found in ${resolved}`);
+    }
+
+    const fileMap = new Map<string, unknown>();
+    for (const f of files) {
+        const key = path.basename(f, '.json');
+        const raw = fs.readFileSync(path.join(resolved, f), 'utf-8');
+        fileMap.set(key, JSON.parse(raw) as unknown);
+    }
+    return parseTakeoutMonthly(fileMap);
+}
+
+/**
+ * Parse data using a specific format or auto-detect.
+ */
+function loadDataset(
+    data: unknown,
+    isDirectory: boolean,
+    format?: string,
+): MappitDataset {
+    if (isDirectory) {
+        return loadDirectory(data as string);
+    }
+
+    if (format) {
+        switch (format as DataSource) {
+            case 'records':
+                return parseRecords(data);
+            case 'timeline-standard':
+                return parseTimelineStandard(data);
+            case 'timeline-semantic':
+                return parseTimelineSemantic(data);
+            case 'timeline-ios':
+                return parseTimelineIos(data);
+            default:
+                die(
+                    `unknown format "${format}". Valid: records, timeline-standard, timeline-semantic, timeline-ios`,
+                );
+        }
+    }
+
+    return parseAuto(data);
+}
+
+/**
+ * Pretty-print dataset summary to stdout.
+ */
+function printSummary(ds: MappitDataset): void {
+    const s = computeSummary(ds);
+
+    console.log('\n  Dataset Summary');
+    console.log('─'.repeat(45));
+    console.log(`Source format:     ${ds.source}`);
+    console.log(`Date range:        ${s.dateRange.min || '—'}  →  ${s.dateRange.max || '—'}`);
+    console.log(`Raw points:        ${s.totalPoints.toLocaleString()}`);
+    console.log(`Timeline entries:  ${(s.visits + s.activities).toLocaleString()}`);
+    console.log(`  Visits:          ${s.visits.toLocaleString()}`);
+    console.log(`  Activities:      ${s.activities.toLocaleString()}`);
+    console.log(`Unique places:     ${s.uniquePlaces.toLocaleString()}`);
+    console.log(`Total distance:    ${(s.totalDistanceMeters / 1000).toFixed(1)} km`);
+
+    if (Object.keys(s.distanceByActivity).length > 0) {
+        console.log('\nDistance by activity:');
+        const sorted = Object.entries(s.distanceByActivity).sort(
+            (a, b) => b[1] - a[1],
+        );
+        for (const [type, meters] of sorted) {
+            console.log(
+                `  ${type.padEnd(20)} ${(meters / 1000).toFixed(1).padStart(10)} km`,
+            );
+        }
+    }
+
+    const yearly = computeYearlySummary(ds);
+    if (yearly.length > 1) {
+        console.log('\nYearly breakdown:');
+        for (const y of yearly) {
+            const ys = y.summary;
+            console.log(
+                `  ${y.label}:  ${ys.visits} visits, ${ys.activities} activities, ${(ys.totalDistanceMeters / 1000).toFixed(0)} km`,
+            );
+        }
+    }
+
+    console.log();
+}
+
+/**
+ * Apply all filters specified via CLI flags.
+ */
+function applyFilters(
+    ds: MappitDataset,
+    filterDate?: string[],
+    filterArea?: string,
+    filterActivity?: string,
+): MappitDataset {
+    let result = ds;
+
+    if (filterDate && filterDate.length >= 2) {
+        const [start, end] = filterDate;
+        result = filterByDateRange(result, start, end);
+    }
+
+    if (filterArea) {
+        const parts = filterArea.split(',').map(Number);
+        if (parts.length !== 4 || parts.some(isNaN)) {
+            die('--filter-area expects 4 comma-separated numbers: south,west,north,east');
+        }
+        const [south, west, north, east] = parts;
+        const bounds: BoundingBox = { south, west, north, east };
+        result = filterByArea(result, bounds);
+    }
+
+    if (filterActivity) {
+        const types = filterActivity.split(',').map((t) => t.trim());
+        result = filterByActivityType(result, types);
+    }
+
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+// CLI definition
+// ---------------------------------------------------------------------------
+
+export function run(argv?: string[]): void {
+    const args = argv ?? hideBin(process.argv);
+
+    yargs(args)
+        .scriptName('mappit-core')
+        .version(VERSION)
+        .usage('$0 <command> [options]')
+        .command(
+            'load <path>',
+            'Load a Google Location History file or directory',
+            (y) =>
+                y
+                    .positional('path', {
+                        describe: 'Path to a JSON file or Takeout directory',
+                        type: 'string',
+                        demandOption: true,
+                    })
+                    .option('format', {
+                        alias: 'f',
+                        describe: 'Force a specific format instead of auto-detecting',
+                        choices: [
+                            'records',
+                            'timeline-standard',
+                            'timeline-semantic',
+                            'timeline-ios',
+                        ] as const,
+                        type: 'string',
+                    })
+                    .option('filter-date', {
+                        alias: 'd',
+                        describe: 'Filter by date range (two ISO dates)',
+                        type: 'string',
+                        array: true,
+                        nargs: 2,
+                    })
+                    .option('filter-area', {
+                        alias: 'a',
+                        describe: 'Filter by bounding box: south,west,north,east',
+                        type: 'string',
+                    })
+                    .option('filter-activity', {
+                        describe:
+                            'Filter by activity types (comma-separated, e.g. WALKING,CYCLING)',
+                        type: 'string',
+                    })
+                    .option('export', {
+                        alias: 'e',
+                        describe: 'Export to file (.json or .kml)',
+                        type: 'string',
+                    })
+                    .option('stats', {
+                        alias: 's',
+                        describe: 'Print summary statistics',
+                        type: 'boolean',
+                        default: false,
+                    }),
+            (cmdArgv) => {
+                const spinner = ora({ stream: process.stdout });
+
+                try {
+                    // 1 — Load
+                    spinner.start('Loading data…');
+                    const { data, isDirectory } = readInput(cmdArgv.path as string);
+                    let ds = loadDataset(data, isDirectory, cmdArgv.format);
+                    spinner.succeed(
+                        `Loaded ${ds.source} — ${ds.points.length} points, ${ds.timeline.length} timeline entries`,
+                    );
+
+                    // 2 — Filter
+                    const hasFilters =
+                        cmdArgv.filterDate || cmdArgv.filterArea || cmdArgv.filterActivity;
+                    if (hasFilters) {
+                        spinner.start('Applying filters…');
+                        ds = applyFilters(
+                            ds,
+                            cmdArgv.filterDate as string[] | undefined,
+                            cmdArgv.filterArea,
+                            cmdArgv.filterActivity,
+                        );
+                        spinner.succeed(
+                            `Filtered — ${ds.points.length} points, ${ds.timeline.length} timeline entries`,
+                        );
+                    }
+
+                    // 3 — Stats
+                    if (cmdArgv.stats || (!cmdArgv.export && !hasFilters)) {
+                        printSummary(ds);
+                    }
+
+                    // 4 — Export
+                    if (cmdArgv.export) {
+                        spinner.start(`Exporting to ${cmdArgv.export}…`);
+                        const ext = path.extname(cmdArgv.export).toLowerCase();
+                        let content: string;
+
+                        if (ext === '.kml') {
+                            content = exportToKml(ds);
+                        } else {
+                            content = exportToJson(ds);
+                        }
+
+                        fs.writeFileSync(cmdArgv.export, content, 'utf-8');
+                        spinner.succeed(`Written to ${cmdArgv.export}`);
+                    }
+                } catch (err: unknown) {
+                    const msg = err instanceof Error ? err.message : String(err);
+                    spinner.fail(msg);
+                    process.exit(1);
+                }
+            },
+        )
+        .demandCommand(1, 'Please specify a command (e.g. "load")')
+        .strict()
+        .help()
+        .alias('h', 'help')
+        .parseSync();
+}
+
+run();
