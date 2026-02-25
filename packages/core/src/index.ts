@@ -53,3 +53,31 @@ export {
   parseAuto,
   type DetectedFormat,
 } from './loaders';
+
+// Phase 2.1 — Filters
+export {
+  filterByDateRange,
+  filterByArea,
+  filterByActivityType,
+  type BoundingBox,
+} from './filters';
+
+// Phase 2.2 — Transforms
+export { simplifyDataset, timelineToPoints } from './transforms';
+
+// Phase 2.3 — Statistics
+export {
+  computeSummary,
+  computeYearlySummary,
+  computeMonthlySummary,
+  type DatasetSummary,
+  type PeriodSummary,
+} from './stats';
+
+// Phase 2.4–2.5 — Exporters
+export {
+  exportToJson,
+  exportToKml,
+  type JsonExportOptions,
+  type KmlExportOptions,
+} from './exporters';

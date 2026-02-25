@@ -178,21 +178,21 @@ interface MappitDataset {
 
 > **Obiettivo**: il core offre operazioni di filtro, statistiche e export.
 
-- [ ] **2.1** `packages/core/src/filters.ts`
+- [x] **2.1** `packages/core/src/filters.ts`
   - `filterByDateRange(dataset, start, end)` — filtra sia `points` che `timeline`
   - `filterByArea(dataset, bounds)` — bounding box geografico (il `--filterspace` attualmente TODO)
   - `filterByActivityType(dataset, types[])` — filtra per tipo di attività
-- [ ] **2.2** `packages/core/src/transforms.ts`
+- [x] **2.2** `packages/core/src/transforms.ts`
   - `simplifyDataset(dataset)` — versione evoluta di `simplifyData` attuale
   - `timelineToPoints(dataset)` — esplode i segmenti della timeline in punti individuali (per scatter/heatmap)
   - _(fase futura)_ `recordsToTimeline(dataset)` — clustering temporale/spaziale per convertire punti GPS grezzi in pseudo-visite e pseudo-segmenti
-- [ ] **2.3** `packages/core/src/stats.ts`
+- [x] **2.3** `packages/core/src/stats.ts`
   - `computeSummary(dataset)` — calcola statistiche: distanza totale, numero visite, distribuzione attività, date min/max
   - `computeYearlySummary(dataset)` / `computeMonthlySummary(dataset)` — estrarre la logica da `calculateSummaries()` in timeline.html
-- [ ] **2.4** `packages/core/src/exporters/json-exporter.ts` — esporta dataset filtrato in JSON semplificato
-- [ ] **2.5** `packages/core/src/exporters/kml-exporter.ts` — estrarre la logica di `exportToKML()` da timeline.html
-- [ ] **2.6** Test unitari per filtri, trasformazioni e exporter
-- [ ] **2.7** Aggiornare `packages/core/src/index.ts` con tutti gli export
+- [x] **2.4** `packages/core/src/exporters/json-exporter.ts` — esporta dataset filtrato in JSON semplificato
+- [x] **2.5** `packages/core/src/exporters/kml-exporter.ts` — estrarre la logica di `exportToKML()` da timeline.html
+- [x] **2.6** Test unitari per filtri, trasformazioni e exporter
+- [x] **2.7** Aggiornare `packages/core/src/index.ts` con tutti gli export
 
 **Deliverable**: la libreria è completa come modulo programmatico.
 
