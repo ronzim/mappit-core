@@ -61,31 +61,56 @@ function readInput(filePath: string): { data: unknown; isDirectory: boolean } {
 }
 
 /**
- * Load monthly files from a Takeout directory.
+ * Recursively collect files matching a pattern from a directory tree.
+ */
+function findFilesRecursive(dir: string, pattern: RegExp): string[] {
+    const results: string[] = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        // Skip Zone.Identifier files and hidden files
+        if (entry.name.includes(':') || entry.name.startsWith('.')) continue;
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            results.push(...findFilesRecursive(full, pattern));
+        } else if (pattern.test(entry.name)) {
+            results.push(full);
+        }
+    }
+    return results;
+}
+
+/**
+ * Load data from a Takeout directory (or any directory containing supported files).
+ *
+ * Discovery strategy (first match wins):
+ * 1. YYYY_MONTH.json files anywhere in the tree → parseTakeoutMonthly
+ * 2. Records.json anywhere in the tree → parseRecords
+ * 3. Timeline.json anywhere in the tree → parseAuto
  */
 function loadDirectory(dirPath: string): MappitDataset {
     const resolved = path.resolve(dirPath);
-    const files = fs.readdirSync(resolved).filter((f) => /^\d{4}_[A-Z]+\.json$/i.test(f));
 
-    if (files.length === 0) {
-        // Fall back: look for a single Timeline.json or Records.json in the dir
-        for (const name of ['Timeline.json', 'Records.json']) {
-            const candidate = path.join(resolved, name);
-            if (fs.existsSync(candidate)) {
-                const raw = fs.readFileSync(candidate, 'utf-8');
-                return parseAuto(JSON.parse(raw) as unknown);
-            }
+    // 1 — Look for monthly files (e.g. 2024_JANUARY.json) anywhere in the tree
+    const monthlyFiles = findFilesRecursive(resolved, /^\d{4}_[A-Z]+\.json$/i);
+    if (monthlyFiles.length > 0) {
+        const fileMap = new Map<string, unknown>();
+        for (const f of monthlyFiles) {
+            const key = path.basename(f, '.json');
+            const raw = fs.readFileSync(f, 'utf-8');
+            fileMap.set(key, JSON.parse(raw) as unknown);
         }
-        die(`no supported files found in ${resolved}`);
+        return parseTakeoutMonthly(fileMap);
     }
 
-    const fileMap = new Map<string, unknown>();
-    for (const f of files) {
-        const key = path.basename(f, '.json');
-        const raw = fs.readFileSync(path.join(resolved, f), 'utf-8');
-        fileMap.set(key, JSON.parse(raw) as unknown);
+    // 2 — Look for Records.json or Timeline.json anywhere in the tree
+    for (const name of ['Records.json', 'Timeline.json']) {
+        const found = findFilesRecursive(resolved, new RegExp(`^${name}$`, 'i'));
+        if (found.length > 0) {
+            const raw = fs.readFileSync(found[0], 'utf-8');
+            return parseAuto(JSON.parse(raw) as unknown);
+        }
     }
-    return parseTakeoutMonthly(fileMap);
+
+    die(`no supported files found in ${resolved}`);
 }
 
 /**
