@@ -254,29 +254,30 @@ interface MappitDataset {
 
 > **Obiettivo**: replicare la UI di timeline.html nell'app Electron.
 
-- [ ] **5.1** Integrare deck.gl API nel renderer
-  - Gestire eventuale API key via variabile d'ambiente / file di configurazione (non hardcoded)
-  - markers, linee, InfoWindow
-- [ ] **5.2** Sidebar con timeline
-  - Date picker (range)
-  - Lista cronologica di visite e attività
-  - Icone per tipo attività
+- [x] **5.1** Integrare deck.gl API nel renderer
+  - maplibre-gl come base map (gratuito, nessuna API key)
+  - deck.gl MapboxOverlay con ScatterplotLayer (visite) e PathLayer (attività)
+  - Tile CartoDB Dark Matter per coerenza col tema scuro dell'app
+- [x] **5.2** Sidebar con timeline
+  - Date picker (range) con navigazione prev/next e filtro GO
+  - Lista cronologica di visite e attività con intestazioni per data
+  - Dot colorati per tipo attività (no emoji — cross-platform)
   - Click per evidenziare su mappa e viceversa
-- [ ] **5.3** Filtri attività (checkbox per tipo, mostra/nascondi visite e spostamenti)
-- [ ] **5.4** Rendering mappa
-  - Marker per le visite (`renderPlaceVisit`)
-  - Polilinee per gli spostamenti (`renderActivitySegment`)
-  - Auto-zoom/fit bounds
-  - Highlight polyline al click
-- [ ] **5.5** Interazione mappa↔sidebar
-  - Click marker → evidenzia sidebar item e viceversa
-  - Scroll automatico alla sidebar item corrispondente
+- [x] **5.3** Filtri attività (checkbox per tipo, mostra/nascondi visite e spostamenti)
+- [x] **5.4** Rendering mappa
+  - ScatterplotLayer per le visite (cerchi ambra, highlight blu)
+  - PathLayer per gli spostamenti (colore per tipo attività)
+  - Auto-zoom/fit bounds al caricamento
+  - Tooltip su hover con nome luogo / tipo attività
+- [x] **5.5** Interazione mappa↔sidebar
+  - Click marker → evidenzia sidebar item e scroll automatico
+  - Click sidebar item → flyTo/fitBounds sulla mappa
 - [ ] **5.6** Place Details (opzionale/progressivo)
   - Fetch via Google Places API per arricchire i marker (disponibile dopo migrazione a Google Maps)
   - Cache su filesystem: file JSON in `app.getPath('userData')`, lettura/scrittura gestita dal main process via IPC
   - Toggle per disabilitare chiamate API
 
-**Deliverable**: l'app è comparabile a timeline.html per la vista mappa+timeline.
+**Deliverable**: l'app è comparabile a timeline.html per la vista mappa+timeline. ✅
 
 ---
 

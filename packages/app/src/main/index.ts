@@ -33,6 +33,9 @@ import type { MappitDataset, DataSource, BoundingBox } from 'mappit-core';
 // ---------------------------------------------------------------------------
 
 let mainWindow: BrowserWindow | null = null;
+/** Full dataset as originally loaded (never mutated by filters). */
+let originalDataset: MappitDataset | null = null;
+/** Current (possibly filtered) dataset used for stats/export. */
 let currentDataset: MappitDataset | null = null;
 
 // ---------------------------------------------------------------------------
@@ -179,6 +182,7 @@ function registerIpcHandlers(): void {
         'dataset:load',
         (_event, args: { filePath: string; format?: string }) => {
             const ds = loadFromPath(args.filePath, args.format);
+            originalDataset = ds;
             currentDataset = ds;
             // Also push to renderer as an event
             mainWindow?.webContents.send('dataset:loaded', ds);
@@ -197,11 +201,12 @@ function registerIpcHandlers(): void {
                 activityTypes?: string[];
             },
         ) => {
-            if (!currentDataset) {
+            if (!originalDataset) {
                 throw new Error('No dataset loaded');
             }
 
-            let ds = currentDataset;
+            // Always filter from the original, unfiltered dataset
+            let ds: MappitDataset = originalDataset;
 
             if (args.dateRange) {
                 ds = filterByDateRange(ds, args.dateRange.start, args.dateRange.end);

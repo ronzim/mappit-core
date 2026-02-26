@@ -4,50 +4,94 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+               script-src 'self' 'unsafe-eval';
+               style-src 'self' 'unsafe-inline';
+               connect-src 'self' https://*.cartocdn.com https://basemaps.cartocdn.com;
+               img-src 'self' data: blob: https://*.cartocdn.com;
+               font-src 'self' data: https://*.cartocdn.com;
+               worker-src 'self' blob:;
+               child-src 'self' blob:;" />
     <title>MappIt</title>
     <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
     <div id="app">
-        <!-- Header -->
-        <header id="header">
+        <!-- ============ Welcome screen (before data loaded) ============ -->
+        <section id="welcome" class="welcome-panel">
             <h1>MappIt</h1>
-            <div id="header-actions">
-                <span id="dataset-info" class="muted"></span>
+            <p>Load a Google Location History export to get started.</p>
+            <p class="muted">
+                Supported: Records.json, Timeline.json (Standard, Semantic, iOS), Takeout directories.
+            </p>
+            <button id="btn-load-welcome" class="btn-primary">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
+                Open File or Directory
+            </button>
+        </section>
+
+        <!-- ============ App layout (after data loaded) ============ -->
+        <div id="app-layout" class="hidden">
+            <!-- ---- Sidebar ---- -->
+            <aside id="sidebar">
+                <!-- Controls -->
+                <div id="sidebar-controls">
+                    <div id="date-picker">
+                        <button id="btn-prev" class="btn-icon" title="Previous period">&#9664;</button>
+                        <input type="date" id="date-start" />
+                        <span class="date-sep">&rarr;</span>
+                        <input type="date" id="date-end" />
+                        <button id="btn-next" class="btn-icon" title="Next period">&#9654;</button>
+                        <button id="btn-apply" class="btn-sm btn-primary-sm">GO</button>
+                    </div>
+                    <div id="sidebar-actions">
+                        <button id="btn-load-new" class="btn-sm" title="Load new data">Load</button>
+                        <button id="btn-summary" class="btn-sm" title="Toggle summary">Summary</button>
+                        <button id="btn-filters-toggle" class="btn-sm" title="Toggle filters">Filters</button>
+                    </div>
+                </div>
+
+                <!-- Filters (collapsible) -->
+                <div id="filters-panel" class="hidden">
+                    <label class="filter-row">
+                        <input type="checkbox" id="show-visits" checked /> Show Visits
+                    </label>
+                    <label class="filter-row">
+                        <input type="checkbox" id="show-activities" checked /> Show Activities
+                    </label>
+                    <div id="activity-type-filters"></div>
+                </div>
+
+                <!-- Timeline list -->
+                <div id="timeline"></div>
+
+                <!-- Status bar -->
+                <div id="status-bar">
+                    <span id="status-text" class="muted">Ready</span>
+                </div>
+            </aside>
+
+            <!-- ---- Map ---- -->
+            <div id="map-container">
+                <div id="map"></div>
             </div>
-        </header>
 
-        <!-- Main content -->
-        <main id="main">
-            <!-- Welcome / empty state -->
-            <section id="welcome" class="panel">
-                <h2>Welcome to MappIt</h2>
-                <p>Load a Google Location History export to get started.</p>
-                <p class="muted">
-                    Supported formats: Records.json, Timeline.json (Standard, Semantic, iOS),
-                    Takeout directory with monthly files.
-                </p>
-                <button id="btn-load-welcome" class="btn-primary"><svg class="icon" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                    </svg> Open File or Directory</button>
-            </section>
-
-            <!-- Dataset summary (shown after load) -->
-            <section id="summary" class="panel hidden">
-                <h2>Dataset Summary</h2>
-                <div id="summary-content"></div>
-                <div id="yearly-breakdown"></div>
-            </section>
-
-            <!-- Status bar -->
-            <footer id="status-bar">
-                <span id="status-text" class="muted">Ready</span>
-            </footer>
-        </main>
+            <!-- ---- Summary overlay ---- -->
+            <div id="summary-overlay" class="hidden">
+                <div class="summary-panel">
+                    <div class="summary-header">
+                        <h2>Summary</h2>
+                        <button id="btn-close-summary" class="btn-icon">&times;</button>
+                    </div>
+                    <div id="summary-content"></div>
+                    <div id="yearly-breakdown"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="./main.ts"></script>

@@ -182,8 +182,8 @@ Registro delle scelte tecniche adottate durante la ristrutturazione del progetto
 | `recordsToTimeline` (clustering GPS → pseudo-visite) | Rimandato                              | Non bloccante per le prime release                                     |
 | Streaming per file > 500 MB                          | Da implementare nel CLI/app            | I loader restano sincroni; lo streaming è responsabilità del chiamante |
 | Framework UI renderer                                | **Vanilla + Vite** (Fase 4) ✅         | Possibile migrazione a Vue.js in futuro                                |
-| Mappa: deck.gl vs Google Maps                        | deck.gl + Mapbox (iniziale)            | Migrazione a Google Maps per Place Details/autocomplete                |
-| Cache Place Details                                  | File JSON in `app.getPath('userData')` | Da implementare in Fase 5–6                                            |
+| Mappa: deck.gl + maplibre-gl                         | **Implementato** (Fase 5) ✅           | maplibre-gl (free) + deck.gl overlay; no API key                       |
+| Cache Place Details                                  | File JSON in `app.getPath('userData')` | Da implementare in Fase 6                                              |
 
 ---
 
@@ -250,4 +250,48 @@ Registro delle scelte tecniche adottate durante la ristrutturazione del progetto
 
 ---
 
-_Ultimo aggiornamento: 2026-06-26_
+## UI Mappa e Timeline (Fase 5)
+
+### maplibre-gl come base map (no Mapbox GL JS)
+
+- **Decisione**: usato `maplibre-gl` (fork open-source di Mapbox GL JS) al posto di `mapbox-gl`.
+- **Motivazione**: completamente gratuito, nessuna API key richiesta. Stessa API di Mapbox GL JS ma con licenza BSD. Il tile server CartoDB (Dark Matter) fornisce tiles vettoriali gratuite. L'alias Vite `'mapbox-gl': 'maplibre-gl'` risolve le importazioni interne di `@deck.gl/mapbox`.
+
+### CartoDB Dark Matter come stile mappa di default
+
+- **Decisione**: stile `https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json` come base map.
+- **Motivazione**: coerenza con il tema scuro dell'app. Tile gratuite e ad alte prestazioni. Nessun token richiesto.
+
+### deck.gl MapboxOverlay (non Deck standalone)
+
+- **Decisione**: le layer deck.gl (ScatterplotLayer, PathLayer) sono iniettate come `MapboxOverlay` su una mappa maplibre-gl preesistente.
+- **Motivazione**: permette di usare le API native di maplibre-gl per navigazione (`flyTo`, `fitBounds`) e controlli (NavigationControl), mentre deck.gl gestisce solo il rendering dei dati. Più flessibile rispetto a `Deck` standalone.
+
+### Filtraggio attività client-side, filtraggio date server-side
+
+- **Decisione**: il filtraggio per tipo di attività (checkbox visite/attività) avviene nel renderer senza IPC. Il filtraggio per intervallo date avviene nel main process via IPC `dataset:filter`.
+- **Motivazione**: il filtraggio attività è un semplice toggle su dati già in memoria nel renderer — nessun roundtrip IPC necessario, risposta istantanea. Il filtraggio date può ridurre significativamente il dataset e merita di essere gestito dal main process (che mantiene `originalDataset` integro).
+
+### AppState con pub/sub per i moduli renderer
+
+- **Decisione**: stato centralizzato nella classe `AppState` (singleton) con pattern pub/sub (`subscribe` / `emit`). Ogni modulo (map, sidebar, filters) si auto-sottoscrive e reagisce autonomamente.
+- **Motivazione**: disaccoppiamento tra moduli renderer senza framework UI. Un cambiamento di stato (es. selezione) viene propagato a tutti i moduli interessati. Basato su listener functions, nessuna dipendenza aggiuntiva.
+
+### Dot colorati CSS al posto di emoji per indicatori tipo attività
+
+- **Decisione**: gli indicatori di tipo attività nella sidebar e nei filtri usano cerchi CSS colorati (`<span class="timeline-dot" style="background: #color">`) invece di caratteri emoji.
+- **Motivazione**: le emoji non rendono correttamente su Linux Electron (mostrano quadrati). I dot CSS sono cross-platform, colorati per tipo attività con la stessa palette di deck.gl, e leggeri.
+
+### `originalDataset` nel main process
+
+- **Decisione**: il main process mantiene sia `originalDataset` (mai mutato) sia `currentDataset` (risultato dell'ultimo filtro). Il handler `dataset:filter` parte sempre da `originalDataset`.
+- **Motivazione**: evita il filtraggio distruttivo cumulativo — l'utente può allargare l'intervallo date senza dover ricaricare il file. `currentDataset` riflette lo stato filtrato corrente per stats e export.
+
+### Indicizzazione wrapper `Indexed<T>` per layer deck.gl
+
+- **Decisione**: i dati passati alle layer deck.gl sono wrappati come `{ entry: T, idx: number }` dove `idx` è la posizione nell'array `filteredEntries` dello stato.
+- **Motivazione**: le layer deck.gl gestiscono array separati per visite e attività, ma il click/hover deve riferirsi all'indice nella timeline complessiva per sincronizzare map ↔ sidebar. Il wrapper evita `indexOf` O(n) per ogni callback deck.gl.
+
+---
+
+_Ultimo aggiornamento: 2026-06-27_

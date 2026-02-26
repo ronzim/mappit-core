@@ -22,6 +22,13 @@ export default defineConfig({
     },
     renderer: {
         root: resolve(__dirname, 'src/renderer'),
+        resolve: {
+            alias: {
+                // deck.gl's @deck.gl/mapbox imports 'mapbox-gl' internally;
+                // redirect to maplibre-gl (free, no token required).
+                'mapbox-gl': 'maplibre-gl',
+            },
+        },
         build: {
             outDir: resolve(__dirname, 'dist/renderer'),
             rollupOptions: {
