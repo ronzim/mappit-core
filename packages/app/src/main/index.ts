@@ -168,15 +168,31 @@ function createWindow(): void {
 function registerIpcHandlers(): void {
     // --- dialog:openFile ---------------------------------------------------
     ipcMain.handle('dialog:openFile', async () => {
-        const result = await dialog.showOpenDialog({
-            properties: ['openFile', 'openDirectory'],
+        // Try file selection first; on Linux GTK, combining openFile +
+        // openDirectory forces directory-only mode, so we try file first
+        // and fall back to directory picker if the user cancels.
+        const fileResult = await dialog.showOpenDialog({
+            title: 'Open Location File or Folder',
+            properties: ['openFile'],
             filters: [
                 { name: 'JSON files', extensions: ['json'] },
                 { name: 'All files', extensions: ['*'] },
             ],
         });
-        if (result.canceled || result.filePaths.length === 0) return null;
-        return result.filePaths[0];
+        if (!fileResult.canceled && fileResult.filePaths.length > 0) {
+            return fileResult.filePaths[0];
+        }
+
+        // User cancelled — offer directory picker as second chance
+        const dirResult = await dialog.showOpenDialog({
+            title: 'Open Takeout Folder',
+            properties: ['openDirectory'],
+        });
+        if (!dirResult.canceled && dirResult.filePaths.length > 0) {
+            return dirResult.filePaths[0];
+        }
+
+        return null;
     });
 
     // --- dialog:saveFile ---------------------------------------------------
