@@ -23,10 +23,12 @@ import {
     filterByActivityType,
     computeSummary,
     computeYearlySummary,
+    computeMonthlySummary,
     exportToJson,
     exportToKml,
 } from 'mappit-core';
-import type { MappitDataset, DataSource, BoundingBox } from 'mappit-core';
+import type { MappitDataset, DataSource, BoundingBox, PlaceVisit } from 'mappit-core';
+import type { PlaceSearchHit } from '../shared/ipc-channels';
 
 // ---------------------------------------------------------------------------
 // State
@@ -177,6 +179,26 @@ function registerIpcHandlers(): void {
         return result.filePaths[0];
     });
 
+    // --- dialog:saveFile ---------------------------------------------------
+    ipcMain.handle(
+        'dialog:saveFile',
+        async (
+            _event,
+            args: { defaultName?: string; filters?: Array<{ name: string; extensions: string[] }> },
+        ) => {
+            const result = await dialog.showSaveDialog({
+                defaultPath: args.defaultName,
+                filters: args.filters ?? [
+                    { name: 'KML files', extensions: ['kml'] },
+                    { name: 'JSON files', extensions: ['json'] },
+                    { name: 'All files', extensions: ['*'] },
+                ],
+            });
+            if (result.canceled || !result.filePath) return null;
+            return result.filePath;
+        },
+    );
+
     // --- dataset:load ------------------------------------------------------
     ipcMain.handle(
         'dataset:load',
@@ -236,6 +258,38 @@ function registerIpcHandlers(): void {
         if (!currentDataset) return [];
         return computeYearlySummary(currentDataset);
     });
+
+    // --- dataset:monthlyStats -----------------------------------------------
+    ipcMain.handle('dataset:monthlyStats', () => {
+        if (!currentDataset) return [];
+        return computeMonthlySummary(currentDataset);
+    });
+
+    // --- dataset:searchPlaces -----------------------------------------------
+    ipcMain.handle(
+        'dataset:searchPlaces',
+        (_event, args: { query: string }): PlaceSearchHit[] => {
+            if (!currentDataset) return [];
+            const q = args.query.toLowerCase().trim();
+            if (q.length < 2) return [];
+
+            const hits: PlaceSearchHit[] = [];
+            currentDataset.timeline.forEach((entry, index) => {
+                if (entry.type !== 'visit') return;
+                const visit = entry as PlaceVisit;
+                const name = (visit.name ?? '').toLowerCase();
+                const pid = (visit.placeId ?? '').toLowerCase();
+                let score = 0;
+                if (name === q) score = 1;
+                else if (name.startsWith(q)) score = 0.8;
+                else if (name.includes(q)) score = 0.6;
+                else if (pid.includes(q)) score = 0.4;
+                if (score > 0) hits.push({ index, visit, score });
+            });
+            hits.sort((a, b) => b.score - a.score);
+            return hits.slice(0, 50);
+        },
+    );
 
     // --- dataset:export ----------------------------------------------------
     ipcMain.handle(

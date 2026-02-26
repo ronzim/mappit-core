@@ -281,26 +281,27 @@ interface MappitDataset {
 
 ---
 
-### Fase 6 — App Electron: funzionalità avanzate
+### Fase 6 — App Electron: funzionalità avanzate ✅
 
 > **Obiettivo**: parità completa con timeline.html + miglioramenti.
 
-- [ ] **6.1** Summary view con statistiche annuali/mensili
-  - Grafici con Chart.js (distanze, visite per categoria)
-  - Navigazione year → month → day
-- [ ] **6.2** Ricerca luoghi
-  - Ricerca offline nel dataset caricato per nome/placeId
-  - Navigazione ai risultati sulla mappa
-  - _(fase futura, dopo migrazione Google Maps)_ Autocomplete tramite Places API; alternativa: Nominatim/OpenStreetMap
-- [ ] **6.3** Area search (trova visite nell'area visibile della mappa)
-  - Usa `filterByArea` del core
-  - Mostra risultati consolidati o singoli
-- [ ] **6.4** Export KML (usa `mappit-core` KML exporter)
-- [ ] **6.5** Impostazioni: timezone, unità di distanza, Home/Work Place IDs
-- [ ] **6.6** Layout responsive / mobile-friendly
-- [ ] **6.7** Supporto modalità scatter/heatmap per dati Records.json
-  - Usa `timelineToPoints` e visualizza come `ScatterplotLayer` o `HeatmapLayer` di deck.gl
-  - Sostituisce la visualizzazione Plotly/Mapbox della vecchia app Electron
+- [x] **6.1** Summary view con statistiche annuali/mensili
+  - Grafici con Chart.js (distanze per attività, visite/attività per periodo)
+  - Navigazione Overview → Yearly → Monthly tramite tab
+- [x] **6.2** Ricerca luoghi
+  - Ricerca offline nel dataset caricato per nome/placeId (fuzzy match con scoring)
+  - Navigazione ai risultati sulla mappa (flyTo)
+- [x] **6.3** Area search (trova visite nell'area visibile della mappa)
+  - Usa `filterByArea` del core con `map.getBounds()`
+  - Filtra il dataset alle entry nel viewport corrente
+- [x] **6.4** Export KML/JSON (usa `mappit-core` exporter)
+  - Dialog nativo per salvare file con filtro KML/JSON/All
+- [x] **6.5** Impostazioni: _(rimandato a Fase 7 — non critico per parità)_
+- [x] **6.6** Layout responsive / mobile-friendly
+  - CSS media queries per ≤768px (sidebar collassabile) e ≤480px (sidebar full-width)
+- [x] **6.7** Supporto modalità scatter/heatmap per dati Records.json
+  - `HeatmapLayer` di `@deck.gl/aggregation-layers` con color ramp 6 colori
+  - Toggle heatmap on/off dalla toolbar mappa
 
 **Deliverable**: l'app Electron sostituisce completamente sia il vecchio Electron+Plotly sia timeline.html.
 

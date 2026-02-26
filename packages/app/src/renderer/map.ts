@@ -13,6 +13,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { ScatterplotLayer, PathLayer } from '@deck.gl/layers';
+import { HeatmapLayer } from '@deck.gl/aggregation-layers';
 import type { PickingInfo } from '@deck.gl/core';
 import type { PlaceVisit, ActivitySegment } from 'mappit-core';
 import { state } from './state';
@@ -41,6 +42,7 @@ interface Indexed<T> {
 let map: maplibregl.Map | null = null;
 let overlay: MapboxOverlay | null = null;
 let tooltipEl: HTMLDivElement | null = null;
+let heatmapMode = false;
 
 const DARK_STYLE =
     'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -84,7 +86,8 @@ export function initMap(containerId: string): void {
             event === 'filters-changed' ||
             event === 'selection-changed'
         ) {
-            updateLayers();
+            if (heatmapMode) buildHeatmapLayers();
+            else updateLayers();
         }
         if (event === 'dataset-changed') {
             fitToData();
@@ -164,6 +167,66 @@ export function updateLayers(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Heatmap mode
+// ---------------------------------------------------------------------------
+
+function buildHeatmapLayers(): void {
+    if (!overlay) return;
+
+    const entries = state.filteredEntries;
+
+    // Collect all coordinate points (visits + activity path points)
+    interface HeatPoint {
+        position: [number, number];
+        weight: number;
+    }
+
+    const points: HeatPoint[] = [];
+    for (const e of entries) {
+        if (e.type === 'visit') {
+            points.push({ position: [e.lng, e.lat], weight: 2 });
+        } else {
+            for (const p of e.path) {
+                points.push({ position: [p.lng, p.lat], weight: 1 });
+            }
+        }
+    }
+
+    const layer = new HeatmapLayer<HeatPoint>({
+        id: 'heatmap',
+        data: points,
+        getPosition: (d) => d.position,
+        getWeight: (d) => d.weight,
+        radiusPixels: 40,
+        intensity: 1,
+        threshold: 0.05,
+        colorRange: [
+            [1, 152, 189],
+            [73, 227, 206],
+            [216, 254, 181],
+            [254, 237, 177],
+            [254, 173, 84],
+            [209, 55, 78],
+        ],
+    });
+
+    overlay.setProps({ layers: [layer] });
+}
+
+export function setHeatmapMode(enabled: boolean): void {
+    heatmapMode = enabled;
+    if (heatmapMode) {
+        buildHeatmapLayers();
+    } else {
+        updateLayers();
+    }
+}
+
+export function isHeatmapMode(): boolean {
+    return heatmapMode;
+}
+
+// ---------------------------------------------------------------------------
 // Camera helpers (exported for sidebar → map interaction)
 // ---------------------------------------------------------------------------
 
@@ -208,6 +271,26 @@ export function fitToData(): void {
         }
     }
     fitToBounds(coords);
+}
+
+// ---------------------------------------------------------------------------
+// Map bounds (for area search)
+// ---------------------------------------------------------------------------
+
+export function getMapBounds(): {
+    south: number;
+    west: number;
+    north: number;
+    east: number;
+} | null {
+    if (!map) return null;
+    const b = map.getBounds();
+    return {
+        south: b.getSouth(),
+        west: b.getWest(),
+        north: b.getNorth(),
+        east: b.getEast(),
+    };
 }
 
 // ---------------------------------------------------------------------------

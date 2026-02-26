@@ -12,6 +12,7 @@ import type {
     InvokeResult,
     MainToRendererEvents,
 } from '../shared/ipc-channels';
+export type { PlaceSearchHit } from '../shared/ipc-channels';
 
 // ---------------------------------------------------------------------------
 // Typed invoke helper
@@ -32,6 +33,10 @@ export const api = {
     /** Open a native file/directory picker and return the selected path. */
     openFile: () => invoke('dialog:openFile'),
 
+    /** Open a native save dialog and return the selected path. */
+    saveFile: (opts?: InvokeArgs['dialog:saveFile']) =>
+        invoke('dialog:saveFile', opts ?? {}),
+
     /** Load a dataset from a file or directory path. */
     loadDataset: (filePath: string, format?: string) =>
         invoke('dataset:load', { filePath, format }),
@@ -45,6 +50,13 @@ export const api = {
 
     /** Get yearly breakdown statistics. */
     getYearlyStats: () => invoke('dataset:yearlyStats'),
+
+    /** Get monthly breakdown statistics. */
+    getMonthlyStats: () => invoke('dataset:monthlyStats'),
+
+    /** Search places in the current dataset by name/placeId. */
+    searchPlaces: (query: string) =>
+        invoke('dataset:searchPlaces', { query }),
 
     /** Export the current dataset to a file. */
     exportDataset: (filePath: string) =>

@@ -52,6 +52,12 @@
                         <button id="btn-load-new" class="btn-sm" title="Load new data">Load</button>
                         <button id="btn-summary" class="btn-sm" title="Toggle summary">Summary</button>
                         <button id="btn-filters-toggle" class="btn-sm" title="Toggle filters">Filters</button>
+                        <button id="btn-export" class="btn-sm" title="Export KML/JSON">Export</button>
+                    </div>
+
+                    <!-- Search -->
+                    <div id="search-bar">
+                        <input type="text" id="search-input" placeholder="Search places…" autocomplete="off" />
                     </div>
                 </div>
 
@@ -66,6 +72,9 @@
                     <div id="activity-type-filters"></div>
                 </div>
 
+                <!-- Search results (shown when searching) -->
+                <div id="search-results" class="hidden"></div>
+
                 <!-- Timeline list -->
                 <div id="timeline"></div>
 
@@ -78,6 +87,11 @@
             <!-- ---- Map ---- -->
             <div id="map-container">
                 <div id="map"></div>
+                <!-- Map toolbar (top-left, below nav controls) -->
+                <div id="map-toolbar">
+                    <button id="btn-area-search" class="btn-map" title="Search in visible area">Area Search</button>
+                    <button id="btn-heatmap" class="btn-map" title="Toggle heatmap view">Heatmap</button>
+                </div>
             </div>
 
             <!-- ---- Summary overlay ---- -->
@@ -85,9 +99,18 @@
                 <div class="summary-panel">
                     <div class="summary-header">
                         <h2>Summary</h2>
+                        <div class="summary-nav">
+                            <button id="btn-summary-overview" class="btn-sm btn-primary-sm">Overview</button>
+                            <button id="btn-summary-yearly" class="btn-sm">Yearly</button>
+                            <button id="btn-summary-monthly" class="btn-sm">Monthly</button>
+                        </div>
                         <button id="btn-close-summary" class="btn-icon">&times;</button>
                     </div>
                     <div id="summary-content"></div>
+                    <div id="chart-container" class="hidden">
+                        <canvas id="chart-distance"></canvas>
+                        <canvas id="chart-visits"></canvas>
+                    </div>
                     <div id="yearly-breakdown"></div>
                 </div>
             </div>

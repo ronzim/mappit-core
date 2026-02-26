@@ -294,4 +294,43 @@ Registro delle scelte tecniche adottate durante la ristrutturazione del progetto
 
 ---
 
+## Fase 6 — Funzionalità avanzate
+
+### Chart.js per grafici nel Summary
+
+- **Decisione**: i grafici statistici nella Summary view usano Chart.js (bar chart orizzontali per distanza per attività, grouped bar per visite/attività per periodo).
+- **Motivazione**: leggero (~60KB gzip), API semplice, supporto dark theme tramite configurazione scale/tick colors, nessuna dipendenza aggiuntiva pesante. Registrazione selettiva dei soli componenti necessari (`BarController`, `BarElement`, `CategoryScale`, `LinearScale`, `Tooltip`, `Legend`).
+
+### Navigazione Summary a tab (Overview / Yearly / Monthly)
+
+- **Decisione**: la Summary overlay offre tre viste navigabili tramite tab button: Overview (stats grid + distance by activity chart), Yearly (breakdown tabella + chart periodo), Monthly (breakdown tabella + chart periodo).
+- **Motivazione**: evita una vista monolitica troppo lunga. L'utente può esplorare i dati aggregati a diversi livelli di granularità senza sovraccaricare l'interfaccia.
+
+### Ricerca offline fuzzy con scoring
+
+- **Decisione**: la ricerca luoghi avviene nel main process con match fuzzy: exact match (score 1.0), startsWith (0.8), includes (0.6), placeId includes (0.4). Risultati top 50 ordinati per score.
+- **Motivazione**: approccio semplice senza dipendenze di text search (fuse.js, lunr). Sufficiente per dataset Google Takeout dove i nomi sono short strings. Il main process gestisce la ricerca per non bloccare il renderer.
+
+### `HeatmapLayer` da `@deck.gl/aggregation-layers`
+
+- **Decisione**: la modalità heatmap usa `HeatmapLayer` di `@deck.gl/aggregation-layers` con color ramp 6 colori (blue → cyan → green → yellow → orange → red), `radiusPixels: 40`.
+- **Motivazione**: HeatmapLayer è GPU-accelerata e gestisce nativamente l'aggregazione dei punti. Supporta il weight per differenziare visite (peso 2) da path points (peso 1). Toggle on/off senza ricreare il MapboxOverlay.
+
+### Area search con `map.getBounds()`
+
+- **Decisione**: il pulsante Area Search legge il bounding box dal viewport corrente di maplibre-gl (`map.getBounds()`) e lo passa al filtro `filterByArea` del core via IPC.
+- **Motivazione**: modo intuitivo per filtrare — l'utente naviga/zooma sulla zona di interesse, poi preme il pulsante. Non serve disegnare rettangoli o digitare coordinate.
+
+### Export con save dialog nativo
+
+- **Decisione**: l'export usa `dialog.showSaveDialog()` di Electron con filtri per KML, JSON e All files. Il path selezionato viene passato al handler `dataset:export` del core.
+- **Motivazione**: esperienza utente familiare (dialog OS nativo). I filtri estensione guidano l'utente verso i formati supportati.
+
+### CSS responsive con breakpoints 768px / 480px
+
+- **Decisione**: layout responsive con due media query breakpoints: ≤768px (sidebar si sovrappone come pannello assoluto, collassabile) e ≤480px (sidebar full-width).
+- **Motivazione**: supporto tablet e mobile per eventuali future distribuzioni web o per utenti con finestre Electron ridimensionate. Priorità bassa ma costo implementativo minimo (solo CSS).
+
+---
+
 _Ultimo aggiornamento: 2026-06-27_

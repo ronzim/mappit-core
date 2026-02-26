@@ -10,6 +10,7 @@ import type {
     DatasetSummary,
     PeriodSummary,
     BoundingBox,
+    PlaceVisit,
 } from 'mappit-core';
 
 // ---------------------------------------------------------------------------
@@ -31,6 +32,7 @@ export interface MainToRendererEvents {
 /** Arguments for each IPC invoke channel. */
 export interface InvokeArgs {
     'dialog:openFile': void;
+    'dialog:saveFile': { defaultName?: string; filters?: Array<{ name: string; extensions: string[] }> };
     'dataset:load': { filePath: string; format?: string };
     'dataset:filter': {
         dateRange?: { start: string; end: string };
@@ -39,16 +41,31 @@ export interface InvokeArgs {
     };
     'dataset:stats': void;
     'dataset:yearlyStats': void;
+    'dataset:monthlyStats': void;
+    'dataset:searchPlaces': { query: string };
     'dataset:export': { filePath: string };
+}
+
+/** Search hit returned by the place search channel. */
+export interface PlaceSearchHit {
+    /** Index of the entry in `currentDataset.timeline`. */
+    index: number;
+    /** The matching place visit. */
+    visit: PlaceVisit;
+    /** Simple relevance score (0..1). */
+    score: number;
 }
 
 /** Return types for each IPC invoke channel. */
 export interface InvokeResult {
     'dialog:openFile': string | null;
+    'dialog:saveFile': string | null;
     'dataset:load': MappitDataset;
     'dataset:filter': MappitDataset;
     'dataset:stats': DatasetSummary | null;
     'dataset:yearlyStats': PeriodSummary[];
+    'dataset:monthlyStats': PeriodSummary[];
+    'dataset:searchPlaces': PlaceSearchHit[];
     'dataset:export': boolean;
 }
 
