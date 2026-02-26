@@ -226,27 +226,27 @@ interface MappitDataset {
 
 > **Obiettivo**: nuova app Electron con architettura sicura che usa il core.
 
-- [ ] **4.1** Configurare Electron recente (v33+) in `packages/app/`
+- [x] **4.1** Configurare Electron recente (v33+) in `packages/app/`
   - `contextIsolation: true`, `nodeIntegration: false`
   - Preload script con `contextBridge`
   - IPC channels tipizzati per comunicazione main↔renderer
-- [ ] **4.2** Scegliere un framework per il renderer:
+- [x] **4.2** Scegliere un framework per il renderer:
   - **Vanilla JS + bundler** (più vicino all'attuale timeline.html, migrazione più semplice)
-- [ ] **4.3** Configurare Vite come bundler per il renderer process
-- [ ] **4.4** Main process: usare `mappit-core` per tutte le operazioni dati
+- [x] **4.3** Configurare Vite come bundler per il renderer process
+- [x] **4.4** Main process: usare `mappit-core` per tutte le operazioni dati
   - `ipc.handle('load-dataset', (path) => loadDataset(path))`
   - `ipc.handle('filter', (dataset, filters) => filterByDateRange(...))`
   - `ipc.handle('export-kml', (dataset, range) => exportToKML(...))`
   - `ipc.handle('compute-stats', (dataset) => computeSummary(...))`
-- [ ] **4.5** Renderer process: gestione stato dei dati caricati
+- [x] **4.5** Renderer process: gestione stato dei dati caricati
   - Riceve `MappitDataset` serializzato dal main process via IPC
   - Mantiene stato locale per filtri attivi, date selezionate, vista corrente
-- [ ] **4.6** Implementare caricamento dati
+- [x] **4.6** Implementare caricamento dati
   - Seleziona cartella/file tramite dialog nativo di Electron (sostituisce File System Access API del browser)
   - Il main process usa `mappit-core` per caricare e inviare i dati al renderer
   - Supporto sia per directory Takeout che per singoli file
 
-**Deliverable**: app che carica dati da qualsiasi formato e li mostra in console/log.
+**Deliverable**: app che carica dati da qualsiasi formato e li mostra in console/log. ✅
 
 ---
 

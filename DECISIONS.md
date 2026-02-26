@@ -181,7 +181,7 @@ Registro delle scelte tecniche adottate durante la ristrutturazione del progetto
 | ---------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------- |
 | `recordsToTimeline` (clustering GPS → pseudo-visite) | Rimandato                              | Non bloccante per le prime release                                     |
 | Streaming per file > 500 MB                          | Da implementare nel CLI/app            | I loader restano sincroni; lo streaming è responsabilità del chiamante |
-| Framework UI renderer                                | Vanilla + Vite (iniziale)              | Possibile migrazione a Vue.js in futuro                                |
+| Framework UI renderer                                | **Vanilla + Vite** (Fase 4) ✅         | Possibile migrazione a Vue.js in futuro                                |
 | Mappa: deck.gl vs Google Maps                        | deck.gl + Mapbox (iniziale)            | Migrazione a Google Maps per Place Details/autocomplete                |
 | Cache Place Details                                  | File JSON in `app.getPath('userData')` | Da implementare in Fase 5–6                                            |
 
@@ -198,6 +198,40 @@ Registro delle scelte tecniche adottate durante la ristrutturazione del progetto
 
 - **Decisione**: installato `ora@5` invece della v6/v7 più recente.
 - **Motivazione**: ora v6+ è ESM-only. Il progetto core emette CommonJS (`"module": "CommonJS"` in tsconfig). La v5 è l'ultima versione con supporto `require()`.
+
+---
+
+## App Electron (Fase 4)
+
+### electron-vite v5 per build orchestration
+
+- **Decisione**: usato `electron-vite` v5.0.0 per gestire la build dei 3 entry point Electron (main, preload, renderer) con un'unica configurazione.
+- **Motivazione**: evita di configurare manualmente 3 build Vite separate. `electron-vite` genera automaticamente le directory `dist/main`, `dist/preload`, `dist/renderer`. Gestisce hot-reload in dev mode e `externalizeDepsPlugin()` per escludere dipendenze Node.js dal bundle.
+
+### Vanilla JS + Vite per il renderer
+
+- **Decisione**: il renderer usa TypeScript vanilla (nessun framework UI come React/Vue/Svelte) con Vite come bundler.
+- **Motivazione**: migrazione più semplice dalla logica di `timeline.html`. Meno dipendenze, meno complessità. Possibile migrazione a Vue.js in futuro se la UI cresce.
+
+### IPC channels tipizzati con InvokeArgs/InvokeResult
+
+- **Decisione**: creato `src/shared/ipc-channels.ts` con interfacce `InvokeArgs` e `InvokeResult` che mappano ogni canale IPC ai tipi dei suoi argomenti e del suo valore di ritorno.
+- **Motivazione**: type safety end-to-end tra main e renderer. Il preload script espone un'API tipizzata via `contextBridge`, e il renderer accede a `window.api` con autocompletamento e controllo dei tipi.
+
+### contextIsolation: true, sandbox: false
+
+- **Decisione**: il `BrowserWindow` usa `contextIsolation: true` e `nodeIntegration: false` (architettura sicura), ma `sandbox: false` per il preload script.
+- **Motivazione**: `sandbox: false` è necessario perché il preload script usa `require('electron')` per accedere a `ipcRenderer`. Con sandbox attivo, il preload non avrebbe accesso ai moduli Node.js. Questo è il compromesso standard per app Electron con `contextBridge`.
+
+### Stato dataset mutabile nel main process
+
+- **Decisione**: il main process mantiene una variabile `currentDataset: MappitDataset | null` che viene aggiornata ad ogni caricamento/filtro.
+- **Motivazione**: il main process è il "backend" dell'app — gestisce i dati in memoria e risponde alle richieste IPC dal renderer. Il renderer riceve solo copie serializzate via IPC. Questo evita di trasmettere ripetutamente l'intero dataset.
+
+### findFilesRecursive duplicata da CLI
+
+- **Decisione**: la funzione `findFilesRecursive()` per la scansione ricorsiva di directory Takeout è duplicata nel main process dell'app, non estratta come utility condivisa nel core.
+- **Motivazione**: il core (libreria) accetta dati già parsati — la responsabilità di leggere file è del chiamante (CLI o app). Duplicare ~20 righe di codice evita di aggiungere dipendenze I/O al core. Potrà essere estratta in un modulo condiviso se necessario.
 
 ### `run()` esportata e accetta `argv` opzionale
 

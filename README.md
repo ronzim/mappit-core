@@ -7,7 +7,7 @@ Il repository è un **monorepo npm workspaces** composto da due package:
 | Package       | Percorso         | Descrizione                                                                                           |
 | ------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
 | `mappit-core` | `packages/core/` | Libreria Node.js + CLI. Carica, normalizza e filtra dati di localizzazione da tutti i formati Google. |
-| `mappit-app`  | `packages/app/`  | App Electron per la visualizzazione (in sviluppo — vedi [ROADMAP.md](ROADMAP.md)).                    |
+| `mappit-app`  | `packages/app/`  | App Electron per la visualizzazione interattiva dei dati di localizzazione.                           |
 
 ---
 
@@ -84,8 +84,6 @@ const dataset = await loadDataset('./Takeout/Location History');
 const filtered = filterByDateRange(dataset, '2024-01-01', '2024-06-30');
 ```
 
-> **Nota**: l'implementazione completa dei loader e dei filtri è pianificata nella Fase 1–2. Vedi [ROADMAP.md](ROADMAP.md).
-
 ### Uso da CLI
 
 Dopo la build, il comando `mappit-core` è disponibile tramite `npx`:
@@ -160,24 +158,56 @@ Se usavi la vecchia CLI basata su Electron (`src/main.js`), ecco la mappatura de
 
 ## `mappit-app` — App Electron
 
-> **Stato attuale**: placeholder — l'implementazione è pianificata dalla Fase 4 in poi. Vedi [ROADMAP.md](ROADMAP.md).
+App desktop per esplorare i dati di Google Location History. Usa `mappit-core` come motore dati e comunica via IPC tipizzati con architettura sicura (`contextIsolation`, `contextBridge`).
 
-### Sviluppo (futuro)
+### Funzionalità attuali
+
+- Caricamento file o directory Takeout tramite dialog nativo di Electron
+- Scansione ricorsiva delle directory (gestisce la struttura annidata di Google Takeout)
+- Auto-detect del formato (tutti e 5 i formati supportati dal core)
+- Visualizzazione summary: statistiche generali, distanza per attività, breakdown annuale
+- Filtro per intervallo date con ricalcolo statistiche
+- Export dataset filtrato in JSON o KML
+
+### Architettura
+
+| Processo | Entry point                  | Ruolo                                                          |
+| -------- | ---------------------------- | -------------------------------------------------------------- |
+| Main     | `src/main/index.ts`          | Gestisce finestra, dialog, e operazioni dati via `mappit-core` |
+| Preload  | `src/preload/index.ts`       | Espone `window.api` tipizzato via `contextBridge`              |
+| Renderer | `src/renderer/main.ts`       | UI, stato locale, rendering summary                            |
+| Shared   | `src/shared/ipc-channels.ts` | Tipi IPC condivisi (`InvokeArgs`, `InvokeResult`)              |
+
+### Sviluppo
 
 ```bash
-cd packages/app
-npm run dev
+# Dev mode con hot-reload (electron-vite)
+npm run dev --workspace=packages/app
+
+# Build di produzione
+npm run build --workspace=packages/app
+
+# Controlla solo i tipi senza emettere file
+npm run typecheck --workspace=packages/app
 ```
 
-### Build di produzione (futuro)
+La build produce output in `packages/app/dist/`:
 
-```bash
-cd packages/app
-npm run build
-
-# Pacchettizzazione con electron-builder
-npm run dist
 ```
+dist/
+├── main/       ← main process bundle
+├── preload/    ← preload script bundle
+└── renderer/   ← HTML + CSS + JS per il renderer
+```
+
+### Stack tecnologico
+
+- **Electron** v33+ con `contextIsolation: true`, `nodeIntegration: false`
+- **electron-vite** v5 per build orchestration (main, preload, renderer)
+- **Vite** v7 come bundler per il renderer
+- **Vanilla TypeScript** per la UI (nessun framework)
+
+> La UI mappa e timeline (deck.gl, sidebar, filtri interattivi) è pianificata per la Fase 5. Vedi [ROADMAP.md](ROADMAP.md).
 
 ---
 
@@ -221,6 +251,12 @@ mappit-core/
 │   │   └── vitest.config.ts
 │   └── app/                ← mappit-app (Electron)
 │       ├── src/
+│       │   ├── main/       ← main process
+│       │   ├── preload/    ← preload script (contextBridge)
+│       │   ├── renderer/   ← UI (HTML + CSS + TS)
+│       │   └── shared/     ← tipi IPC condivisi
+│       ├── dist/           ← output build (gitignored)
+│       ├── electron.vite.config.ts
 │       ├── package.json
 │       └── tsconfig.json
 ├── fixtures/               ← dati di test per tutti i formati
@@ -230,7 +266,8 @@ mappit-core/
 ├── eslint.config.js
 ├── .prettierrc
 ├── package.json            ← workspace root
-└── ROADMAP.md              ← piano di sviluppo dettagliato
+├── ROADMAP.md              ← piano di sviluppo dettagliato
+└── DECISIONS.md            ← registro decisioni implementative
 ```
 
 ---

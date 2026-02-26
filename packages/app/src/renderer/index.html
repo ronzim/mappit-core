@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <title>MappIt</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header id="header">
+            <h1>MappIt</h1>
+            <div id="header-actions">
+                <span id="dataset-info" class="muted"></span>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main id="main">
+            <!-- Welcome / empty state -->
+            <section id="welcome" class="panel">
+                <h2>Welcome to MappIt</h2>
+                <p>Load a Google Location History export to get started.</p>
+                <p class="muted">
+                    Supported formats: Records.json, Timeline.json (Standard, Semantic, iOS),
+                    Takeout directory with monthly files.
+                </p>
+                <button id="btn-load-welcome" class="btn-primary"><svg class="icon" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg> Open File or Directory</button>
+            </section>
+
+            <!-- Dataset summary (shown after load) -->
+            <section id="summary" class="panel hidden">
+                <h2>Dataset Summary</h2>
+                <div id="summary-content"></div>
+                <div id="yearly-breakdown"></div>
+            </section>
+
+            <!-- Status bar -->
+            <footer id="status-bar">
+                <span id="status-text" class="muted">Ready</span>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="./main.ts"></script>
+</body>
+
+</html>
