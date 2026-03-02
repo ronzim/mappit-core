@@ -226,6 +226,14 @@ function applyFilters(
 // CLI definition
 // ---------------------------------------------------------------------------
 
+/**
+ * Entry point for the mappit-core CLI.
+ *
+ * Parses command-line arguments via yargs and orchestrates loading,
+ * filtering, statistics, and export operations.
+ *
+ * @param argv - Optional array of arguments (defaults to `process.argv`).
+ */
 export function run(argv?: string[]): void {
     const args = argv ?? hideBin(process.argv);
 

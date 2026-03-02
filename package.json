@@ -2,6 +2,33 @@
   "name": "mappit-monorepo",
   "version": "0.1.0",
   "private": true,
+  "description": "Open-source toolkit to load, filter, and visualize Google Location History data from Google Takeout — desktop app (Electron) and CLI",
+  "keywords": [
+    "google-location-history",
+    "google-takeout",
+    "location-history-viewer",
+    "google-maps-timeline",
+    "gps-visualization",
+    "geolocation",
+    "google-timeline",
+    "location-data",
+    "electron",
+    "kml-export",
+    "privacy",
+    "map-visualization",
+    "deck-gl",
+    "maplibre"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ronzim/mappit-core.git"
+  },
+  "homepage": "https://github.com/ronzim/mappit-core#readme",
+  "bugs": {
+    "url": "https://github.com/ronzim/mappit-core/issues"
+  },
+  "license": "MIT",
+  "author": "ronzim",
   "workspaces": [
     "packages/*"
   ],
@@ -9,8 +36,7 @@
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "lint": "eslint packages/*/src",
-    "format": "prettier --write \"packages/*/src/**/*.ts\"",
-    "legacy:start": "electron src/main.js"
+    "format": "prettier --write \"packages/*/src/**/*.ts\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.24.0",

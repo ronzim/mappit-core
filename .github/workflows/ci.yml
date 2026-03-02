@@ -1,0 +1,76 @@
+name: CI
+
+on:
+    push:
+        branches: [main, refactoring]
+    pull_request:
+        branches: [main]
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+            - run: npm ci
+            - run: npm run lint
+
+    test:
+        name: Test (Node ${{ matrix.node-version }})
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18, 20, 22]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: npm
+            - run: npm ci
+            - run: npm run build --workspace=packages/core
+            - run: npm run test --workspace=packages/core
+
+    typecheck:
+        name: Type Check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+            - run: npm ci
+            - run: npm run typecheck --workspace=packages/core
+            - run: npm run typecheck --workspace=packages/app
+
+    build-app:
+        name: Build Electron App (${{ matrix.os }})
+        runs-on: ${{ matrix.os }}
+        needs: [lint, test, typecheck]
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+            - run: npm ci
+            - run: npm run build --workspace=packages/core
+            - run: npm run build --workspace=packages/app
+            - name: Package with electron-builder
+              run: npm run dist --workspace=packages/app
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: mappit-app-${{ matrix.os }}
+                  path: packages/app/release/*.*
+                  if-no-files-found: ignore

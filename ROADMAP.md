@@ -307,16 +307,16 @@ interface MappitDataset {
 
 ---
 
-### Fase 7 — Pulizia e rilascio
+### Fase 7 — Pulizia e rilascio ✅
 
 > **Obiettivo**: codice production-ready.
 
-- [ ] **7.1** Rimuovere i file legacy (`src/main.js`, `src/data.js`, `src/plot.js`, `src/utils.js`, `src/defaults.js`, `index.html`, `test_data.js`, `timeline.html`)
-- [ ] **7.2** Documentazione API per `mappit-core` (JSDoc o TypeDoc)
-- [ ] **7.3** README aggiornato con istruzioni per entrambi i package
-- [ ] **7.4** CI/CD: GitHub Actions per lint, test, build
-- [ ] **7.5** Pubblicazione npm del core (opzionale, può restare privato)
-- [ ] **7.6** Build dell'app Electron per distribuzione con electron-builder
+- [x] **7.1** Rimuovere i file legacy (`src/main.js`, `src/data.js`, `src/plot.js`, `src/utils.js`, `src/defaults.js`, `index.html`, `test_data.js`, `timeline.html`)
+- [x] **7.2** Documentazione API per `mappit-core` (JSDoc + TypeDoc)
+- [x] **7.3** README aggiornato con istruzioni per entrambi i package
+- [x] **7.4** CI/CD: GitHub Actions per lint, test, build
+- [x] **7.5** Pubblicazione npm del core (preparata con `prepublishOnly`, workflow publish.yml)
+- [x] **7.6** Build dell'app Electron per distribuzione con electron-builder
 
 ---
 

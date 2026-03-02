@@ -77,6 +77,7 @@ function formatIso(isoStr: string): string {
 // Public API
 // ---------------------------------------------------------------------------
 
+/** Options for {@link exportToKml}. */
 export interface KmlExportOptions {
     /** Document name embedded in the KML (default "MappIt Export"). */
     documentName?: string;

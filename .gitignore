@@ -3,4 +3,6 @@ node_modules
 packages/*/node_modules
 packages/*/dist
 packages/*/coverage
+packages/*/docs
+packages/app/release
 *.tsbuildinfo

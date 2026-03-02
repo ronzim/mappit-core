@@ -64,6 +64,16 @@ interface RawSemanticFile {
 // Public API
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse a Google Timeline Semantic JSON file.
+ *
+ * Expects `{ semanticSegments: [...] }` and normalises each segment into
+ * the unified {@link TimelineEntry} model.
+ *
+ * @param data - Raw parsed JSON (typically from `JSON.parse`).
+ * @returns A {@link MappitDataset} with `source: 'timeline-semantic'`.
+ * @throws If the input does not contain a `semanticSegments` array.
+ */
 export function parseTimelineSemantic(data: unknown): MappitDataset {
   const raw = data as RawSemanticFile;
   if (!raw?.semanticSegments || !Array.isArray(raw.semanticSegments)) {

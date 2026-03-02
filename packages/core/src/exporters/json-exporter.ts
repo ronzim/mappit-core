@@ -8,6 +8,7 @@
 import type { MappitDataset } from '../types';
 import { simplifyDataset } from '../transforms';
 
+/** Options for {@link exportToJson}. */
 export interface JsonExportOptions {
     /** Pretty-print with indentation (default `2`). Set `0` for compact. */
     indent?: number;

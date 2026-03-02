@@ -2,6 +2,34 @@
     "name": "mappit-core",
     "version": "0.1.0",
     "description": "Core library for loading and processing Google Location History data",
+    "license": "MIT",
+    "author": "ronzim",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ronzim/mappit-core.git",
+        "directory": "packages/core"
+    },
+    "keywords": [
+        "google-location-history",
+        "google-takeout",
+        "location-history",
+        "google-maps-timeline",
+        "google-timeline-viewer",
+        "takeout",
+        "timeline",
+        "geolocation",
+        "gps",
+        "gps-data",
+        "kml",
+        "kml-export",
+        "location-data",
+        "google-takeout-parser",
+        "location-history-viewer",
+        "privacy"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -22,7 +50,9 @@
         "dev": "tsc --project tsconfig.json --watch",
         "test": "vitest run",
         "test:watch": "vitest",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "docs": "typedoc",
+        "prepublishOnly": "npm run build"
     },
     "dependencies": {
         "ora": "^5.4.1",
@@ -33,6 +63,7 @@
         "@types/node": "^22.13.4",
         "@types/stream-json": "^1.7.7",
         "@types/yargs": "^17.0.33",
+        "typedoc": "^0.28.17",
         "vitest": "^3.0.6"
     }
 }

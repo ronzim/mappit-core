@@ -11,6 +11,7 @@ import { parseTimelineStandard } from './timeline-standard';
 import { parseTimelineSemantic } from './timeline-semantic';
 import { parseTimelineIos } from './timeline-ios';
 
+/** Format identifier returned by {@link detectFormat}. */
 export type DetectedFormat =
   | 'records'
   | 'timeline-standard'
@@ -76,7 +77,7 @@ export function parseAuto(data: unknown): MappitDataset {
     default:
       throw new Error(
         'Unable to auto-detect format. Provide the data in one of the supported formats: ' +
-          'Records.json, Timeline Standard, Timeline Semantic, Timeline iOS.',
+        'Records.json, Timeline Standard, Timeline Semantic, Timeline iOS.',
       );
   }
 }

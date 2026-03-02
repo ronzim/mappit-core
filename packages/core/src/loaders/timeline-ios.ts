@@ -59,6 +59,16 @@ interface RawIosItem {
 // Public API
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse a Google Maps iOS Timeline export.
+ *
+ * Expects a top-level JSON array of items, each containing `visit` or
+ * `activity` data with optional `timelinePath`.
+ *
+ * @param data - Raw parsed JSON (typically from `JSON.parse`).
+ * @returns A {@link MappitDataset} with `source: 'timeline-ios'`.
+ * @throws If the input is not an array.
+ */
 export function parseTimelineIos(data: unknown): MappitDataset {
   if (!Array.isArray(data)) {
     throw new Error('Invalid Timeline iOS: expected a top-level JSON array');

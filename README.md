@@ -1,4 +1,31 @@
-# MappIt
+# MappIt — Google Location History Viewer & Toolkit
+
+> **Open-source desktop app and CLI to load, filter, and visualize your Google Location History data exported from Google Takeout.**  
+> Supports all export formats (Records.json, Timeline.json, Semantic Location History), handles files > 500 MB, and keeps your data 100 % local.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+
+**Keywords:** google location history viewer, google takeout visualization, google maps timeline viewer, google location history map, location history export tool, GPS data visualization, google timeline data explorer
+
+---
+
+<details>
+<summary><strong>🇬🇧 English summary</strong></summary>
+
+MappIt is a privacy-first toolkit for exploring your Google Location History locally:
+
+- **Electron desktop app** with interactive map (deck.gl + MapLibre), timeline sidebar, activity filters, area search, and KML/JSON export
+- **Node.js CLI** for headless processing, filtering, and exporting
+- **Core library** (`mappit-core`) usable in your own scripts
+- Auto-detects all Google Takeout location formats (Records.json, Timeline.json standard/semantic/iOS, monthly Semantic Location History files)
+- Filters by date range, bounding box, or activity type
+- Computes stats: distance per activity, monthly summaries, yearly breakdowns
+- Exports to JSON and KML
+
+</details>
+
+---
 
 Strumenti per caricare, filtrare e visualizzare i dati di Google Location History scaricati da Google Takeout.
 
@@ -207,7 +234,23 @@ dist/
 - **Vite** v7 come bundler per il renderer
 - **Vanilla TypeScript** per la UI (nessun framework)
 
-> La UI mappa e timeline (deck.gl, sidebar, filtri interattivi) è pianificata per la Fase 5. Vedi [ROADMAP.md](ROADMAP.md).
+> L'app include mappa interattiva (deck.gl + MapLibre), sidebar timeline, filtri attività, ricerca luoghi, area search, summary con grafici, e export KML/JSON.
+
+### Distribuzione
+
+L'app può essere pacchettizzata per Windows, macOS e Linux tramite electron-builder:
+
+```bash
+# Build + package per la piattaforma corrente
+npm run dist --workspace=packages/app
+
+# Oppure per piattaforme specifiche
+npm run dist:win --workspace=packages/app
+npm run dist:mac --workspace=packages/app
+npm run dist:linux --workspace=packages/app
+```
+
+Gli artefatti vengono generati in `packages/app/release/`.
 
 ---
 
@@ -218,8 +261,20 @@ npm run build        # build di tutti i package
 npm run test         # test di tutti i package
 npm run lint         # ESLint su tutti i sorgenti TypeScript
 npm run format       # Prettier su tutti i sorgenti TypeScript
-npm run legacy:start # avvia la vecchia app Electron+Plotly (pre-ristrutturazione)
 ```
+
+---
+
+## Documentazione API
+
+La documentazione API di `mappit-core` è generata con [TypeDoc](https://typedoc.org/) a partire dai commenti JSDoc nel codice sorgente.
+
+```bash
+# Genera la documentazione HTML in packages/core/docs/
+npm run docs --workspace=packages/core
+```
+
+Apri `packages/core/docs/index.html` nel browser per consultarla.
 
 ---
 
@@ -246,8 +301,11 @@ mappit-core/
 │   ├── core/               ← mappit-core (libreria + CLI)
 │   │   ├── src/
 │   │   ├── dist/           ← output build (gitignored)
+│   │   ├── docs/           ← documentazione API TypeDoc (gitignored)
+│   │   ├── tests/
 │   │   ├── package.json
 │   │   ├── tsconfig.json
+│   │   ├── typedoc.json
 │   │   └── vitest.config.ts
 │   └── app/                ← mappit-app (Electron)
 │       ├── src/
@@ -260,11 +318,9 @@ mappit-core/
 │       ├── package.json
 │       └── tsconfig.json
 ├── fixtures/               ← dati di test per tutti i formati
-├── src/                    ← codice legacy (pre-ristrutturazione)
-├── timeline.html           ← viewer HTML standalone (pre-ristrutturazione)
+├── .github/workflows/      ← CI/CD (lint, test, build)
 ├── tsconfig.base.json      ← tsconfig condiviso
 ├── eslint.config.js
-├── .prettierrc
 ├── package.json            ← workspace root
 ├── ROADMAP.md              ← piano di sviluppo dettagliato
 └── DECISIONS.md            ← registro decisioni implementative
